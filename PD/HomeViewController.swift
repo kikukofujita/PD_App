@@ -80,20 +80,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
       //  toolBarBtn.items = [toolBarBtn]
         toolBar.tag = 1
         textField.inputAccessoryView = toolBar
-        
-/*        let toolbar = UIToolbar(frame: CGRectMake(0, 0, 0, 35))
-        let toolBarBtn = UIBarButtonItem(title: "完了", style: .plain, target: self, action: Selector("tappedToolBarBtn:"))
-        let toolBarBtnToday = UIBarButtonItem(title: "今日", style: .plain, target: self, action: Selector(("tappedToolBarBtnToday:")))
-        toolBarBtn.tag = 1
-        toolBarBtnToday.tag = 2
-        
-        textField.inputAccessoryView = toolBar
-*/
-/*        let toolbar = UIToolbar(frame: CGRectMake(0, 0, 0, 35))
-        let doneItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(ViewController.done))
-        let cancelItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(ViewController.cancel))
-        toolbar.setItems([cancelItem, doneItem],animated: true)
- */
     }
 
     
@@ -169,22 +155,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
     }
-    
-/*    // 完了ボタンを押すと閉じる
-    func tappedToolBarBtn(sender: UIBarButtonItem) {
-        textField.resignFirstResponder()
-    }
-    
-    // 今日を押すと今日の日付をセット
-    func tappedToolBarBtnToday(sender: UIBarButtonItem) {
-        myDatePicker.date = Date()
-        chagedLabelDate(date: Date())
-    }
-    
-    func changedDateEvent (sender: UIDatePicker) {
-        var dateSelecter: UIDatePicker = sender 
-        self.chagedLabelDate(date: myDatePicker.date)
-    }*/
     
     func chagedLabelDate(date: Date) {
         let formatter = DateFormatter()
