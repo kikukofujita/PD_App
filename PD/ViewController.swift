@@ -7,11 +7,15 @@
 //
 
 import UIKit
+import RealmSwift
 import Firebase
 import FirebaseAuth
 import ESTabBarController
 
 class ViewController: UIViewController {
+    
+    let realm = try! Realm()
+    var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "date", ascending: false)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,7 +49,7 @@ class ViewController: UIViewController {
         print("DBUG: setupTab")
         
         // 画像のファイル名を指定してESTabBarControllerを作成する
-        let tabBarController: ESTabBarController! = ESTabBarController(tabIconNames: ["home", "measure", "stock", "setting"])
+        let tabBarController: ESTabBarController! = ESTabBarController(tabIconNames: ["home", "measure", "stock", "setting", "measure"])
         
         // 背景色、選択時の色を設定する
         tabBarController.selectedColor = UIColor(red: 1.0, green: 0.44, blue: 1.0, alpha: 1)
@@ -62,27 +66,49 @@ class ViewController: UIViewController {
         let settingViewController = storyboard?.instantiateViewController(withIdentifier: "Setting")
         let measureViewController = storyboard?.instantiateViewController(withIdentifier: "Measure")
         let stockViewController = storyboard?.instantiateViewController(withIdentifier: "Stock")
+        let scrollViewController = storyboard?.instantiateViewController(withIdentifier: "Scroll")
         
         tabBarController.setView(homeViewController, at: 0)
         tabBarController.setView(measureViewController, at: 1)
         tabBarController.setView(settingViewController, at: 3)
         tabBarController.setView(stockViewController, at: 2)
+        tabBarController.setView(scrollViewController, at: 4)
         
        // ハイライトタブ
         tabBarController.highlightButton(at: 1)
-/*         // ボタン設定の場合
-        //tabBarController.setAction({code}, at: 1)}
-        
-// code       let measureViewController = self.storyboard?.instantiateViewController(withIdentifier: "Measure")
+         // ボタン設定の場合
+/*        tabBarController.setAction({
+            let scrollViewController = self.storyboard?.instantiateViewController(withIdentifier: "Scroll")
+            var data = Data()
+            if self.rlmArray.count != 0 {
+                data.id = self.rlmArray.max(ofProperty: "id")! + 1
+            }
+            print("data.id = \(data.id)")
+        //    scrollViewController.data = data
+            self.present(scrollViewController!, animated: true, completion: nil)
+            }, at: 4)  */
+    }
+    
+/* code       let measureViewController = self.storyboard?.instantiateViewController(withIdentifier: "Measure")
         self.present(measureViewController!, animated: true, completion:  nil)
         }
  */
         
 
     }
+/*let task = Task()
+task.date = NSDate()
+
+if taskArray.count != 0 {
+    task.id = taskArray.max(ofProperty: "id")! + 1
+}
+
+inputViewController.task = task
+*/
+
     // StopWaste StartWaste StopPouring StartPouring
     // concentration ml
 
 
-}
+
 

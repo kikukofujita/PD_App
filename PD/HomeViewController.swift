@@ -29,12 +29,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
      // 体重、血圧等
 
     var postArray: [PostData] = []
-//    var dataArray: [Data] = []
+//    var data: Data!
   
     // Realmインスタンス取得
     let realm = try! Realm()
     
-    var dataArray = try! Realm().objects(Data.self).sorted(byKeyPath: "date", ascending: false)
+    var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "date", ascending: false)
     
     var data: Data!
     var postData: PostData!
@@ -165,6 +165,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func doneBtn() {
         textField.resignFirstResponder()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
     }
 
     /*

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		36B0319D07366DF96D9942A1 /* Pods_PD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DC6F957DD920DFC8EB8B2AF /* Pods_PD.framework */; };
+		F30D5CA21FA741D8004AFF9C /* ScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */; };
+		F30D5CA51FAA0AE2004AFF9C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F30D5CA41FAA0AE2004AFF9C /* AudioToolbox.framework */; };
 		F31E54BD1FA0B9AA00882568 /* densityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */; };
 		F31E54BE1FA0B9AA00882568 /* densityTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */; };
 		F31E54C11FA0BB9C00882568 /* volumeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */; };
@@ -31,9 +33,23 @@
 		F3CFF9841F97711F00521911 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CFF9831F97711F00521911 /* LoginViewController.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		F30D5CA31FAA0ABA004AFF9C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		2D087E6900574B6235B14200 /* Pods-PD.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PD.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PD/Pods-PD.debug.xcconfig"; sourceTree = "<group>"; };
 		6DC6F957DD920DFC8EB8B2AF /* Pods_PD.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PD.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollViewController.swift; sourceTree = "<group>"; };
+		F30D5CA41FAA0AE2004AFF9C /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = densityTableViewCell.swift; sourceTree = "<group>"; };
 		F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = densityTableViewCell.xib; sourceTree = "<group>"; };
 		F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = volumeTableViewCell.swift; sourceTree = "<group>"; };
@@ -65,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F30D5CA51FAA0AE2004AFF9C /* AudioToolbox.framework in Frameworks */,
 				36B0319D07366DF96D9942A1 /* Pods_PD.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -75,6 +92,7 @@
 		1F679B93E76DB40EA4D72906 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F30D5CA41FAA0AE2004AFF9C /* AudioToolbox.framework */,
 				6DC6F957DD920DFC8EB8B2AF /* Pods_PD.framework */,
 			);
 			name = Frameworks;
@@ -113,6 +131,7 @@
 				F3CFF9671F94E55B00521911 /* AppDelegate.swift */,
 				F3CFF9691F94E55B00521911 /* ViewController.swift */,
 				F3CFF96B1F94E55B00521911 /* Main.storyboard */,
+				F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */,
 				F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */,
 				F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */,
 				F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */,
@@ -138,6 +157,16 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		F30D5CA61FAA0B05004AFF9C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		F3CFF9631F94E55B00521911 /* PD */ = {
 			isa = PBXNativeTarget;
@@ -149,6 +178,8 @@
 				F3CFF9621F94E55B00521911 /* Resources */,
 				1618E1F0B517E0EFCB40156D /* [CP] Embed Pods Frameworks */,
 				B6117806C774F8E6B4DD38B8 /* [CP] Copy Pods Resources */,
+				F30D5CA31FAA0ABA004AFF9C /* CopyFiles */,
+				F30D5CA61FAA0B05004AFF9C /* Headers */,
 			);
 			buildRules = (
 			);
@@ -271,6 +302,7 @@
 				F346E2881F97A806007337FA /* PostData.swift in Sources */,
 				F3CFF96A1F94E55B00521911 /* ViewController.swift in Sources */,
 				F3CFF9681F94E55B00521911 /* AppDelegate.swift in Sources */,
+				F30D5CA21FA741D8004AFF9C /* ScrollViewController.swift in Sources */,
 				F3A22B701F9B58FF00178E6A /* PDData.swift in Sources */,
 				F3CFF97A1F950F8600521911 /* HomeViewController.swift in Sources */,
 				F3CFF97C1F950FD700521911 /* MeasureViewController.swift in Sources */,

@@ -1,64 +1,59 @@
 //
-//  MeasureViewController.swift
+//  ScrollViewController.swift
 //  PD
 //
-//  Created by 藤田貴久子 on 2017/10/17.
+//  Created by 藤田貴久子 on 2017/10/30.
 //  Copyright © 2017年 kiki.fuji. All rights reserved.
 //
 
 import UIKit
 import RealmSwift
+import AudioToolbox
 
-class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource,UITextViewDelegate {
-    
-/*    @IBOutlet weak var testConstraint: NSLayoutConstraint!        //1029
-    var allY:CGFloat = 0.0         //1029
-*/
-//    @IBOutlet weak var WVolume: UITextField!
-    // keyboard出現時スクロールするための設定↓
-    @IBOutlet weak var WCondition: UITextField! {
-        didSet {
-            WCondition.delegate = self as? UITextFieldDelegate //デリゲートをset
-        }
-    }
-    // keyboard出現時スクロールするための設定↑
-    @IBOutlet weak var WeightField: UITextField!
-    @IBOutlet weak var commentField: UITextView!
-    @IBOutlet weak var outletPicker: UITextField!
-    @IBOutlet weak var dateText: UITextField!
-    @IBOutlet weak var densityField: UITextField!
-    @IBOutlet weak var pouringVField: UITextField!
-    @IBOutlet weak var BTimer: UIButton!
-    @IBOutlet weak var ATimer: UIButton!
-    @IBOutlet weak var BfrTimer: UILabel!
-    @IBOutlet weak var AftTimer: UILabel!
-    @IBOutlet weak var PStart: UIButton!
-    @IBOutlet weak var PStop: UIButton!
-    @IBOutlet weak var WStart: UIButton!
-    @IBOutlet weak var WStop: UIButton!
+class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource,UITextViewDelegate {
+
+    @IBOutlet weak var WVolume: UITextField!   //廃液量
+    @IBOutlet weak var WCondition: UITextField! //廃液性状
+    @IBOutlet weak var WeightField: UITextField! //体重
+    @IBOutlet weak var commentField: UITextView! //血圧：
+    @IBOutlet weak var outletPicker: UITextField! //出口部状態
+    @IBOutlet weak var dateText: UITextField! //日付
+    @IBOutlet weak var densityField: UITextField! //濃度
+    @IBOutlet weak var pouringVField: UITextField! //注液量
+    @IBOutlet weak var BTimer: UIButton!  //注液timerButton
+    @IBOutlet weak var ATimer: UIButton!  //排液timerButton
+    @IBOutlet weak var BfrTimer: UILabel! //注液timer00:00
+    @IBOutlet weak var AftTimer: UILabel! //排液timer00:00
+    @IBOutlet weak var PStart: UIButton!  //注液開始
+    @IBOutlet weak var PStop: UIButton!   //注液終了
+    @IBOutlet weak var WStart: UIButton!  //排液開始
+    @IBOutlet weak var WStop: UIButton!   //排液終了
     
     let realm = try! Realm()
     var postdata: PostData!
-    var data: Data!
-    var rlmArray: [Data] = []
+    var data = Data()        //←これでdataが使用可能に
+//    var rlmArray: [Data] = []
     var dataArray: [PostData] = []
-    var PStartText = ""
+    var PStartText = ""      //表示用
     var PStopText = ""
     var WStartTex = ""
     var WStopText = ""
     
-    var PStartT = Date()
+    var PStartT = Date()     //realm用
     var PStopT = Date()
     var WStartT = Date()
     var WStopT = Date()
-    var P1 = 0
+    var P1 = 0               //データ入力判定用
     var P2 = 0
     var W1 = 0
     var W2 = 0
     
-    var PTime = ""
+    var PTime = ""           //タイマー表示用
     var WTime = ""
     
+    var uInfo = Date()       //タイマーの開始時間を設定するため
+    
+    let myDatePicker: UIDatePicker = UIDatePicker()
     var pickerView: UIPickerView = UIPickerView()
     var pickerViewD: UIPickerView = UIPickerView()
     var pickerViewV: UIPickerView = UIPickerView()
@@ -73,11 +68,14 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
     var timer: Timer!
     var timer_sec: Int = 0
     
+    var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "date", ascending: false)
+    
+    
     // 注液時間の経過を表示
     @IBAction func beforeTimer(_ sender: Any) {
         passedTime()
     }
-
+    
     // 廃液時間の経過を表示
     @IBAction func afterTimer(_ sender: Any) {
         self.timer.invalidate()  // タイマーstop
@@ -90,6 +88,12 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         PStartText = setTime()
         PStartT = Date()
         P1 = 1
+        PStart.isEnabled = false
+        PStart.setTitleColor(UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1), for: .normal)
+        
+        print("PStart = \(PStartText)")
+        print("PStatT = \(PStartT)")
+        AudioServicesPlayAlertSound(1000)
         
         // 経過時間を表示
         passedTime()
@@ -106,23 +110,28 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         PStopText = setTime()
         PStopT = Date()
         P2 = 1
-        
+        PStop.isEnabled = false
+        PStop.setTitleColor(UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1), for: .normal)
         // タイマーstop
-        self.timer.invalidate()
-        self.timer = nil
-        print("PStopTime = \(PStopText)")
+        if self.timer != nil {
+            self.timer.invalidate()
+            self.timer = nil
+            print("PStopTime = \(PStopText)")
+        }
         
         // 経過時間用のボタンを使用不可にする
         BTimer.isEnabled = false
         ATimer.isEnabled = false
     }
-
+    
     @IBAction func WStartTime(_ sender: Any) {
         WStart.setTitle(setTime(), for: UIControlState.normal)
         WStartTex = setTime()
         WStartT = Date()
         W1 = 1
         passedTime()    // 経過時間表示
+        WStart.isEnabled = false
+        WStart.setTitleColor(UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1), for: .normal)
         print("WStartTime = \(WStartTex)")
         BTimer.isEnabled = true   // 経過用ボタン使用可
         ATimer.isEnabled = true
@@ -133,9 +142,14 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         WStopText = setTime()
         WStopT = Date()
         W2 = 1
-        self.timer.invalidate()  // タイマーstop
-        self.timer = nil
-        print("WStopTime = \(WStopText)")
+        if self.timer != nil {
+            self.timer.invalidate()  // タイマーstop
+            self.timer = nil
+            print("WStopTime = \(WStopText)")
+            WStop.isEnabled = false
+            WStop.setTitleColor(UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1), for: .normal)
+        }
+        
         BTimer.isEnabled = false   // 経過用ボタン使用不可
         ATimer.isEnabled = false
     }
@@ -146,31 +160,39 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         PStartText = "注液開始"
         PStartT = Date()
         P1 = 0
+        passedTime()
+        PStart.isEnabled = true
     }
-
-
+    
+    // 注液終了時間を削除
     @IBAction func D2(_ sender: Any) {
         PStop.setTitle("注液終了", for: UIControlState.normal)
         PStopText = "注液終了"
         PStopT = Date()
         P2 = 0
+        passedTime()
+        PStop.isEnabled = true
     }
     
+    // 排液開始時間を削除
     @IBAction func D3(_ sender: Any) {
         WStart.setTitle("廃液開始", for: UIControlState.normal)
         WStartTex = "廃液開始"
         WStartT = Date()
         W1 = 0
+        passedTime()
+        WStart.isEnabled = true
     }
     
+    // 排液終了時間を削除
     @IBAction func D4(_ sender: Any) {
         WStop.setTitle("廃液終了", for: UIControlState.normal)
         WStopText = "廃液終了"
         WStopT = Date()
         W2 = 0
+        passedTime()
+        WStop.isEnabled = true
     }
-
-    
     
     // 現在の時間をStringにする
     func setTime() -> String {
@@ -178,7 +200,7 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         formatter.dateFormat = "HH:mm:ss"
         return formatter.string(from: Date())
     }
-    var uInfo = Date()
+    
     
     // 時間経過を1秒ごとにupdateTimeを動作させる
     func passedTime() {
@@ -186,83 +208,47 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         
         // 計測開始を設定
         if W1 == 0 && P1 != 0 { // PStartあり WStartなし
-                uInfo = PStartT
+            uInfo = PStartT
         } else {               // WStartあり
             uInfo = WStartT
         }
         print("uInfo = \(uInfo)")
-
-        if self .timer == nil {
+        
+        if self.timer == nil {
             self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTime), userInfo: nil, repeats: true)
         } else {
             self.timer.invalidate()  // タイマーstop
             self.timer = nil
         }
     }
-/*
- var PStartT = Date()!     var PStopT = Date()!
- var WStartT = Date()!      var WStopT = Date()!
- var PTime = Date()       var WTime = Date()
- */
+    /*
+     var PStartT = Date()!     var PStopT = Date()!
+     var WStartT = Date()!      var WStopT = Date()!
+     var PTime = Date()       var WTime = Date()
+     */
     // 1秒毎に経過時間を表示させる
     func updateTime(timer: Timer) {
         // 現在日時
         let nowDate = Date()
         let interval = Int(nowDate.timeIntervalSince(uInfo))
-                
+        
         let min = interval / 60
         let sec = interval % 60
         let timeString = String(format: "%02d:%02d", min, sec)
         
-        print("timeString = \(timeString)")
         if W1 == 0 {
             BfrTimer.text = timeString
         } else {
             AftTimer.text = timeString
+        }
+        if interval % 300 == 2 {
+            AudioServicesPlayAlertSound(1008)
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-/*        //Viewを作成   1029↓
-        let  testView = UIView()
-        testView.frame.size.height = 60
-        testView.backgroundColor = UIColor.blue
-        
-        // 閉じるボタンを作成
-        let  closeButton = UIButton()
-        closeButton.setTitle("閉じる", for:UIControlState.normal)
-        closeButton.backgroundColor = UIColor.red
-        closeButton.addTarget(self, action: Selector(("onClickCloseButton:")), for: .touchUpInside)
-        
-        //　Viewに閉じるボタンを追加
-        testView.addSubview(closeButton)
-        
-        // Autoresizingの変換をオフにする
-        closeButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        // ボタンの幅の制約を追加
-        testView.addConstraint(NSLayoutConstraint(item: closeButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 0.0, constant: 70))
-        
-        // ボタンの高さの制約を追加
-        testView.addConstraint(NSLayoutConstraint(item: closeButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 0.0, constant: 50))
-        // ボタンの右端とViewの右端を揃える制約を追加する
-        testView.addConstraint(NSLayoutConstraint(item: closeButton, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: testView, attribute: NSLayoutAttribute.trailing, multiplier: 1.0, constant: 0))
-        
-        // ボタンの上端とViewの上端を揃える制約を追加
-        testView.addConstraint(NSLayoutConstraint(item: closeButton, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: testView, attribute: NSLayoutAttribute.top, multiplier: 1.0, constant: 0))
-        
-        // キーボードにViewを追加
-        WCondition.inputAccessoryView = testView
-        
-        // テキストビューのデリゲート先にこのインスタンスを設定
-        WCondition.delegate = self as? UITextFieldDelegate
-        
-        // キーボードが現れる時に通知するメソッドを登録
-        NotificationCenter.default.addObserver(self, selector: Selector(("keyboardWillBeShown")), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        // 1029↑
-*/
         // 背景をタップしたらdismissKeyboardメソッドを呼ぶ
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         self.view.addGestureRecognizer(tapGesture)
@@ -293,47 +279,22 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         pickerViewW.tag = 3
         
         // datePickerViewを設定
-        let myDatePicker: UIDatePicker = UIDatePicker()
+//  let myDatePicker: UIDatePicker = UIDatePicker()
         myDatePicker.addTarget(self, action: #selector(changedDateEvent(sender: )), for: .valueChanged)
         myDatePicker.datePickerMode = UIDatePickerMode.date
         dateText.inputView = myDatePicker
         
+        // 今日の日付を表示
+        let dateFormatter: DateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        
+        let selectDate: String = dateFormatter.string(from: Date())
+        dateText.text = selectDate as String
+        
+        
         // Do any additional setup after loading the view.
     }
     
-/*    // 1029↓
-    // 閉じるボタンで呼び出されるメソッド
-    func onClickCloseButton(sender: UIButton) {
-        WCondition.resignFirstResponder()
-        
-        // テキストビューの位置を元に戻す
-        if (allY > 0) {
-            testConstraint.constant -= allY
-            UIView.animate(withDuration: 0.5, animations: { self.view.layoutIfNeeded()})
-        }
-        allY = 0.0
-    }
-    
-    // キーボードが開くときの呼び出しメソッド
-    func keyboardWillBeShown(notification: NSNotification) {
-        
-        // キーボードのフレームを取得
-        if let keyboardFrame = (notification.userInfo![UIKeyboardFrameEndUserInfoKey] as AnyObject).cgRectValue {
-            
-            // テキストビューの最大Y座標と、キーボードの最小Y座標の差を計算する
-            let zureY = WCondition.frame.maxY - keyboardFrame.minY
-            
-            if (zureY > 0) {
-                // テキストビューの垂直方向の位置の制約に差分をプラス
-                testConstraint.constant += zureY
-                allY += zureY
-                
-                // アニメーションさせる
-                UIView.animate(withDuration: 0.5, animations:{ self.view.layoutIfNeeded()})
-            }
-        }
-    }
-*/
     func dismissKeyboard(){
         // キーボードを閉じる
         view.endEditing(true)
@@ -392,24 +353,74 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
             WCondition.endEditing(true)
         }
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    // keyboard出現時スクロールするための設定↓
+/*    // keyboard出現時スクロールするための設定↓
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.configureObserver()
     }
-    
+*/
+// var data: Data!
+// var rlmArray: [Data] = []
+/*   dateText: UITextField! //日付
+     WVolume: UITextField!   //廃液量
+     WCondition: UITextField! //廃液性状
+     WeightField: UITextField! //体重
+     commentField: UITextView! //血圧：
+     outletPicker: UITextField! //出口部状態
+     densityField: UITextField! //濃度
+     pouringVField: UITextField! //注液量
+     var PStartT = Date()     //realm用
+     var PStopT = Date()
+     var WStartT = Date()
+     var WStopT = Date()
+*/
     override func viewDidDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.removeObserver()  // Notificationを画面が消える時に削除
+        try! realm.write {
+            _ = Data()
+            if rlmArray.count != 0 {
+                self.data.id = rlmArray.max(ofProperty: "id")! + 1
+            } else {
+                self.data.id = 1
+            }
+            print("data.id = \(self.data.id)")
+            self.data.date = Date()        //日付
+            if let pVol = Int(pouringVField.text!) {
+                self.data.pouringVolume = pVol
+            } else {
+            self.data.pouringVolume = 0         //注液量
+            }
+            self.data.density = densityField.text!  // 透析液濃度
+            self.data.liquidWaste = WCondition.text! // 廃液の状態
+            self.data.bloodPressure = commentField.text // 血圧
+            if let wt = Double(WeightField.text!) {
+                self.data.weight = wt
+            } else {
+                self.data.weight = 0.0                // 体重
+            }
+            if let wVol = Int(WVolume.text!) {
+                self.data.wasteVolume = wVol
+            } else {
+                self.data.wasteVolume = 0             // 廃液量
+            }
+            self.data.startPouring = PStartT
+            self.data.stopPouring = PStopT
+            self.data.startWaste = WStartT
+            self.data.stopWaste = WStopT
+            self.data.outletCondition = outletPicker.text!
+            self.data.difference = self.data.wasteVolume - self.data.pouringVolume
+
+        super.viewWillDisappear(animated)            
+    }
+//        self.removeObserver()  // Notificationを画面が消える時に削除
     }
     
-    // Notificationを設定
+/*    // Notificationを設定
     func configureObserver() {
         let notification = NotificationCenter.default
         notification.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
@@ -444,16 +455,17 @@ class MeasureViewController: UIViewController, UIPickerViewDelegate, UIPickerVie
         textField.resignFirstResponder() // Returnキーを押した時にキーボードを下げる
         return true
     }
-    // keyboard出現時スクロールするための設定↑
-
+    // keyboard出現時スクロールするための設定↑ */
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
 }
+
