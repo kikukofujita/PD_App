@@ -16,12 +16,24 @@ class Data: Object {
     dynamic var id = 0
     
     //  日付
-    dynamic var date = Date()           // ●日付　　time
+    dynamic var date = Date()
+    dynamic var findDate = ""           // ●日付　　time
+                // 検索用日付
     dynamic var startPouring = Date()   // ●注液スタート  startPtime
+    dynamic var startPText = ""
+    
     dynamic var stopPouring = Date()    // ●注液ストップ  stopPtime
+    dynamic var stopPText = ""
+    
     dynamic var startWaste = Date()     // ●廃液スタート  startWtime
+    dynamic var startWText = ""
+    
     dynamic var stopWaste = Date()      // ●廃液ストップ  stopWtime
+    dynamic var stopWText = ""
     dynamic var pouringVolume = 0     // ●注液量      pouringV
+    
+    dynamic var pouringTime = ""      // 注液時間
+    dynamic var wasteTime = ""        // 排液時間
     dynamic var wasteVolume = 0       // ●廃液量      wasteV
     dynamic var difference = 0        // ●徐水量（廃液量 - 注液量）
     dynamic var density = ""        // ●透析液濃度   density
@@ -31,6 +43,9 @@ class Data: Object {
     dynamic var bloodPressure = ""   // ●血圧         BP
     dynamic var weight = 0.0          //● 体重         weight
     
+    dynamic var stock = 0             // 在庫
+    
+    
     // id = プライマリーキー
     override static func primaryKey() -> String? {
         return "id"
@@ -38,13 +53,24 @@ class Data: Object {
 
 }
 
-class List: Object {
+class ListD: Object {
     
     // id
     dynamic var id = 0
     
     // 濃度の選択肢
     dynamic var listDensity = ""
+    
+    // id = primary key
+    override static func primaryKey() -> String? {
+        return "id"
+    }
+}
+
+class ListV: Object {
+    
+    // id
+    dynamic var id = 0
     
     // 容量の選択肢
     dynamic var listVolume = 0

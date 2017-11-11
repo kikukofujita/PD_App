@@ -20,6 +20,14 @@ class PostTableViewCell: UITableViewCell {
     @IBOutlet weak var WVolumeLabel: UILabel!
     @IBOutlet weak var wasteLabel: UILabel!
     @IBOutlet weak var etc: UILabel!
+    @IBOutlet weak var weight: UILabel!
+    @IBOutlet weak var fDateText: UILabel!
+    @IBOutlet weak var idText: UILabel!
+    @IBOutlet weak var differenceText: UILabel!
+    @IBOutlet weak var totalVText: UILabel!
+
+    @IBAction func button(_ sender: Any) {
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -32,23 +40,35 @@ class PostTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setPostData(postData: PostData) {
-        self.densityLabel.text = postData.density
+/*    func setData(data: Data) {
+        print("PostTableViewCell data = \(data)")
+        self.densityLabel.text = data.density
+        self.weight.text = String(data.weight)
         
-        let pv = postData.pouringVolume?.description
-        self.PVolumeLabel.text = pv ?? ""
+        let pv = data.pouringVolume.description
+        self.PVolumeLabel.text = pv
         
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
-        let stpp:String = formatter.string(from: postData.stopPouring! as Date)
+        let stpp:String = formatter.string(from: data.stopPouring as Date)
         stopPLabel.text = stpp
         
-        let sttw:String = formatter.string(from: postData.startWaste! as Date)
+        let sttw:String = formatter.string(from: data.startWaste as Date)
         startWLabel.text = sttw
         
-        let bp = postData.weight?.description
-        etc.text = "\(String(describing: bp)) + \n + \(String(describing: postData.bloodPressure))"
+        self.PtimeLabel.text = data.pouringTime
+        self.WtimeLabel.text = data.wasteTime
+*/
+/*        let formatter2 = DateFormatter()
+        formatter2.dateFormat = "yyyy/MM/dd"
+        let fd:String = formatter2.string(from: data.date as Date)
+        fDateText.text = fd       */
+/*        fDateText.text = data.findDate
+        
+        let bp = data.weight.description
+        etc.text = "\(String(describing: bp)) + \n + \(String(describing: data.bloodPressure))"
     }
+*/
 }
 
     

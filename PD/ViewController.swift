@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     
     let realm = try! Realm()
     var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "date", ascending: false)
+    var data = Data()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,17 +78,32 @@ class ViewController: UIViewController {
        // ハイライトタブ
         tabBarController.highlightButton(at: 1)
          // ボタン設定の場合
-/*        tabBarController.setAction({
-            let scrollViewController = self.storyboard?.instantiateViewController(withIdentifier: "Scroll")
-            var data = Data()
+        tabBarController.setAction({
+            print("tab 4 tapped")
+            guard let homeVC = homeViewController as? HomeViewController,
+                let scrollVC = scrollViewController as? ScrollViewController else {
+            return
+            }   // 上記はそれぞれ変数を代入し、nilでないことを確認している
+                // もしnilなら、returnで処理を強制的に終了してエラーを防止
+            
+            let data = Data()
+            data.findDate = homeVC.textField.text!
+            scrollVC.x = homeVC.textField.text ?? ""
+            
+            print("ViewC_tab4tapped x = \(scrollVC.x)")
+            print("ViewC_tab4tapped count = \(self.rlmArray.count)")
+            scrollVC.data = self.data
             if self.rlmArray.count != 0 {
-                data.id = self.rlmArray.max(ofProperty: "id")! + 1
+                self.data.id = self.rlmArray.max(ofProperty: "id")! + 1
             }
-            print("data.id = \(data.id)")
-        //    scrollViewController.data = data
-            self.present(scrollViewController!, animated: true, completion: nil)
-            }, at: 4)  */
+            scrollVC.idText.text = String(scrollVC.data.id)
+            print("ViewC_tab4tapped id = \(self.data.id)")
+        }, at: 4)
     }
+    
+/*    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let scrollViewController: ScrollViewController = segue.destination as! ScrollViewController
+    } */
     
 /* code       let measureViewController = self.storyboard?.instantiateViewController(withIdentifier: "Measure")
         self.present(measureViewController!, animated: true, completion:  nil)
@@ -108,7 +124,6 @@ inputViewController.task = task
 
     // StopWaste StartWaste StopPouring StartPouring
     // concentration ml
-
 
 
 

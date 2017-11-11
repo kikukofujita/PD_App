@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 import ESTabBarController
 import Firebase
 import FirebaseAuth
@@ -17,17 +18,27 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
     @IBOutlet weak var tableView: UITableView!
 
     
-    var list: [List] = []
+    var listD = ListD()
+    var listV = ListV()
 
     // Tableで使用する配列を定義
-    let densityList: Array = ["廃液", "1.5ダイアニール", "エクストラニール"]
-    let volumeList: Array = ["0", "1500"]
+ //   let densityList: Array = ["0", "廃液", "1.5ダイアニール", "エクストラニール"]
+ //   let volumeList: Array = ["0", "1500"]
+    var volArray = try! Realm().objects(ListV.self).sorted(byKeyPath: "listVolume", ascending: false)
+    var denArray = try! Realm().objects(ListD.self).sorted(byKeyPath: "id", ascending: false)
+    
     
     // Sectionで使用する配列を定義
     let sectionList: Array = ["濃度", "容量"]
     
+    
+    // リスト入力画面から戻る
+    @IBAction func unwind(_ segue: UIStoryboardSegue) {
+        
+    }
+    
+    
     // ログアウトボタンをタップしたときに呼ばれるメソッド
-
     @IBAction func handleLogoutButton(_ sender: Any) {
         print("DEBUG: ログアウトボタンをタップ")
         // ログアウトする
@@ -83,9 +94,11 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if indexPath.section == 0 {
-            print("Value: \(densityList[indexPath.row])")
+        //    let cell = tableView.dequeueReusableCell(withIdentifier: "CellD", for: indexPath as IndexPath) as! densityTableViewCell
+         //   print("Value: \(cell.densityLabel))")
         } else if indexPath.section == 1 {
-            print("Value: \(volumeList[indexPath.row])")
+        //    let cell = tableView.dequeueReusableCell(withIdentifier: "CellV", for: indexPath as IndexPath) as! volumeTableViewCell
+        //        print("Value: \(cell.volumeLabel)")
         }
     }
     
@@ -93,11 +106,11 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // density
         if section == 0 {
-            return densityList.count
+            return denArray.count
         }
         // volume
         else {
-            return volumeList.count
+            return volArray.count
         }
     }
     
@@ -111,15 +124,27 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
         // density
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "CellD", for: indexPath as IndexPath) as! densityTableViewCell
-            cell.densityLabel.text = densityList[indexPath.row]
+            let listD = denArray[indexPath.row]
+            
+            cell.densityLabel.text = listD.listDensity
             return cell
         }
         // volumeList 
         else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "CellV", for: indexPath as IndexPath) as! volumeTableViewCell
-            cell.volumeLabel.text = volumeList[indexPath.row]
+            let listV = volArray[indexPath.row]
+            if listV.listVolume == listV.listVolume {
+                cell.volumeLabel.text = String(listV.listVolume)
+            }
             return cell
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+     //   print("denArray: \(denArray)")
+     //   print("volArray: \(volArray)")
+        tableView.reloadData()
     }
 
 

@@ -11,6 +11,8 @@ import RealmSwift
 
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIToolbarDelegate, UIPickerViewDelegate {
 
+
+    @IBOutlet weak var totalVolLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textField: UITextField!
     @IBAction func doneBtn(_ sender: Any) {
@@ -34,29 +36,58 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     // Realmインスタンス取得
     let realm = try! Realm()
     
-    var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "date", ascending: false)
+    var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "startPouring", ascending: false)
+    
     
     var data: Data!
     var postData: PostData!
     
     @IBAction func add(_ sender: Any) {
-        let measureViewController = self.storyboard?.instantiateViewController(withIdentifier: "Measure") as! MeasureViewController
+/*        let measureViewController = self.storyboard?.instantiateViewController(withIdentifier: "Measure") as! MeasureViewController
         measureViewController.data = data
-        self.present(measureViewController, animated: true, completion: nil)
+        self.present(measureViewController, animated: true, completion: nil) */
+        textField.text = ""
+        rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "startPouring", ascending: false)
+        tableView.reloadData()
+        print("All Data = \(rlmArray)")
+    }
+    
+    // 日付変更時の呼び出しメソッド
+    func selectDateFilter() {
+        let find = textField.text
+        //let predicate = NSPredicate(format: "data.findDate = %@", find!)
+        let predicate = NSPredicate(format: "findDate = %@", find!)
+        rlmArray = realm.objects(Data.self).filter(predicate)
+        tableView.reloadData()
+        self.totalVolLabel.text = totalVolume()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swipe_right))
+        rightSwipe.delegate = self as? UIGestureRecognizerDelegate
+        rightSwipe.direction = .right
+            tableView.addGestureRecognizer(rightSwipe)
+        
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(swipe_left))
+        leftSwipe.delegate = self as? UIGestureRecognizerDelegate
+        leftSwipe.direction = .left
+        tableView.addGestureRecognizer(leftSwipe)
 
         // Do any additional setup after loading the view.
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        // テーブルセルのタップを無効にする
+ //       tableView.allowsSelection = false
 
         
         let nib = UINib(nibName: "PostTableViewCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: "Cell")
-        tableView.rowHeight = UITableViewAutomaticDimension
+        self.tableView.estimatedRowHeight = 360
+        //tableView.rowHeight = UITableViewAutomaticDimension
         
         // 入力欄の設定
         let formatter = DateFormatter()
@@ -65,6 +96,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         // (from: NSData() as Data)は古いNSData()をDataに変換して使っているため、上記でOK
         textField.text = dateString
         print(dateString)
+        selectDateFilter()
+        
         
         
         // UIDatePickerの設定
@@ -80,11 +113,20 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
       //  toolBarBtn.items = [toolBarBtn]
         toolBar.tag = 1
         textField.inputAccessoryView = toolBar
+        
+        print("count: \(rlmArray.count)")
+        print("viewDidLoad_rlmArray = \(rlmArray)")
+        
+        selectDateFilter()
     }
 
     
     func CGRectMake(_ x: CGFloat, _ y: CGFloat, _ width: CGFloat, _ height: CGFloat) -> CGRect {
         return CGRect(x: x, y: y, width: width, height: height)
+    }
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizerSumultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
     func changedDateEvent(sender: UIDatePicker) {
@@ -94,6 +136,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         let selectDate: String = dateFormatter.string(from: sender.date)
         print("DEBUG: selectDate = \(selectDate)")
         textField.text = selectDate as String
+        selectDateFilter()
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -102,33 +145,50 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     // セルの数
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return postArray.count
+        return rlmArray.count
     }
     
     // 各セルの内容
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // 再利用可能なcell
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath as IndexPath) as! PostTableViewCell
-        cell.setPostData(postData: postArray[indexPath.row])
+    //    cell.setPostData(postData: postArray[indexPath.row])
         
         // Cellに値を設定
-        let data = postArray[indexPath.row]
+        
+        let data = rlmArray[indexPath.row]
         cell.densityLabel.text = data.density
-        let pv = data.pouringVolume?.description
+        
+        let pv = data.pouringVolume.description
         cell.PVolumeLabel.text = pv
-        let wv = data.wasteVolume?.description
+        let wv = data.wasteVolume.description
         cell.WVolumeLabel.text = wv
         cell.wasteLabel.text = data.liquidWaste
+//        cell.fDateText.text = data.findDate
         
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
-        let stpp:String = formatter.string(from: data.stopPouring! as Date)
+        let stpp:String = formatter.string(from: data.stopPouring as Date)
         cell.stopPLabel.text = stpp
         
-        let sttw:String = formatter.string(from: data.startWaste! as Date)
+        let sttw:String = formatter.string(from: data.startWaste as Date)
         cell.startWLabel.text = sttw
         
-        _ = data.weight?.description
+        cell.PtimeLabel.text = data.pouringTime
+        cell.WtimeLabel.text = data.wasteTime
+        cell.idText.text = String(data.id)
+        cell.weight.text = String(data.weight)
+        cell.etc.text = data.bloodPressure
+
+/*        let formatter2 = DateFormatter()
+        formatter2.dateFormat = "yyyy/MM/dd"
+        let fd:String = formatter2.string(from: data.date)
+        cell.fDateText.text = fd   */
+        cell.fDateText.text = data.findDate
+        cell.differenceText.text = String(data.difference)
+        cell.totalVText.text = totalVolume()
+        
+        _ = data.weight.description
 //        etc.text =  (bp) + "\n" +  (data.bloodPressure)
         
         return cell
@@ -141,17 +201,24 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     // 各セルを選択した時に実行されるメソッド
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "toScroll", sender: nil)
         
-        let MeasureViewController = self.storyboard?.instantiateViewController(withIdentifier: "Measure") as! MeasureViewController
+/*        let ScrollViewController = self.storyboard?.instantiateViewController(withIdentifier: "Scroll") as! ScrollViewController
         
-        MeasureViewController.data = data
-        present(MeasureViewController, animated: true, completion: nil)
+        ScrollViewController.data = data
+        present(ScrollViewController, animated: true, completion: nil)  */
     }
     
     // セルが削除可能
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
-        return UITableViewCellEditingStyle.delete
+        //return UITableViewCellEditingStyle.delete
+        if tableView.isEditing {
+            return .delete
+        }
+        return .none
     }
+
+    
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
     }
@@ -167,9 +234,81 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         textField.resignFirstResponder()
     }
     
+    // スワイプ時の呼び出しメソッド　　左右で日付を増減する
+    func swipe_left() {
+/*        if textField.text != "" {
+            print("before: \(textField)")
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy/MM/dd"
+            let d:Date = formatter.date(from: textField.text!)! + 1
+            let dateString:String = formatter.string(from: d)
+            textField.text = dateString
+            print("after: \(textField)")
+            print("swipe right!")
+            selectDateFilter()    */
+            
+    
+            print("swipe_left")
+            if textField.text != "" {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy/MM/dd"
+                
+                let d:Date = formatter.date(from: textField.text!)!
+                let tomorrow = NSCalendar.current.date(byAdding: .day, value: 1, to: d)
+                let dateString:String = formatter.string(from: tomorrow!)
+                textField.text = dateString
+                
+                selectDateFilter()
+            }
+        }
+
+    func swipe_right() {
+        if textField.text != "" {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy/MM/dd"
+            let d:Date = formatter.date(from: textField.text!)! - 1
+            let dateString:String = formatter.string(from: d)
+            textField.text = dateString
+            print("swipe right!")
+            selectDateFilter()
+        }
+    }
+
+    func totalVolume() -> String {
+        var  total = 0
+        
+        // dataの配列から、differenceの合計を計算
+        rlmArray.forEach { (data:Data) in
+            total += data.difference
+        }
+        print("total: \(String(total))")
+        return String(total)
+    }
+
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //let _:ScrollViewController = segue.destination as! ScrollViewController
+        
+        if segue.identifier == "toScroll" {
+            let indexPath = self.tableView.indexPathForSelectedRow
+            
+            if let nav = segue.destination as? UINavigationController {
+                if let scrollVC = nav.topViewController as? ScrollViewController {
+                    
+           //         scrollVC.x = self.textField.text!
+                    scrollVC.data = rlmArray[indexPath!.row]
+                    
+                    print("toScroll によるSegue")
+                    print("toScroll data = \(rlmArray[indexPath!.row])")
+                }
+            }
+        }
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
+        
     }
 
     /*

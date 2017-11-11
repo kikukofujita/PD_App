@@ -11,7 +11,7 @@ import UIKit
 class densityTableViewCell: UITableViewCell {
 
     @IBOutlet weak var densityLabel: UILabel!
-    @IBOutlet weak var densityAdd: UIButton!
+ //   @IBOutlet weak var densityAdd: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -24,7 +24,7 @@ class densityTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setListData(list: List) {
+    func setListData(list: ListD) {
         self.densityLabel.text = list.listDensity
         
     }

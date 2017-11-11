@@ -11,7 +11,7 @@ import UIKit
 class volumeTableViewCell: UITableViewCell {
 
     @IBOutlet weak var volumeLabel: UILabel!
-    @IBOutlet weak var addVolume: UIButton!
+//    @IBOutlet weak var addVolume: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -24,7 +24,7 @@ class volumeTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setListDataV(list: List) {
+    func setListDataV(list: ListV) {
         self.volumeLabel.text = String(list.listVolume)
         
     }

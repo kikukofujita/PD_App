@@ -28,6 +28,21 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     @IBOutlet weak var PStop: UIButton!   //注液終了
     @IBOutlet weak var WStart: UIButton!  //排液開始
     @IBOutlet weak var WStop: UIButton!   //排液終了
+    @IBOutlet weak var BfrWV: UITextField!
+    @IBOutlet weak var idText: UILabel!
+    @IBOutlet weak var stockText: UILabel!
+    @IBAction func selectStock(_ sender: UISegmentedControl) {
+        // セグメント番号でストック場所を表示
+        switch sender.selectedSegmentIndex {
+        case 0:
+            stockText.text = "Home"
+        case 1:
+            stockText.text = "Other"
+        default:
+            stockText.text = "Home"
+        }
+    }
+
     
     let realm = try! Realm()
     var postdata: PostData!
@@ -43,6 +58,11 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     var PStopT = Date()
     var WStartT = Date()
     var WStopT = Date()
+    var p1Text = ""           //Firebase用
+    var p2Text = ""
+    var w1Text = ""
+    var w2Text = ""
+    
     var P1 = 0               //データ入力判定用
     var P2 = 0
     var W1 = 0
@@ -52,6 +72,14 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     var WTime = ""
     
     var uInfo = Date()       //タイマーの開始時間を設定するため
+    var x:String = ""
+    
+    func DatetoString(_ date: Date) -> String {
+        let dateFormatterT: DateFormatter = DateFormatter()
+        dateFormatterT.dateFormat = "HH:mm:ss"
+        return dateFormatterT.string(from: date)
+    }
+    
     
     let myDatePicker: UIDatePicker = UIDatePicker()
     var pickerView: UIPickerView = UIPickerView()
@@ -60,7 +88,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     var pickerViewW: UIPickerView = UIPickerView()
     
     let outletList = ["", "正常", "赤み", "痛み", "はれ", "かさぶた"]
-    let densityList = ["廃液", "1.5ダイアニール", "エクストラニール"]
+    let densityList = ["", "廃液", "1.5ダイアニール", "エクストラニール"]
     let volumeList = ["0", "1500"]
     let wasteList = ["", "正常", "フィブリン", "混濁", "その他"]
     
@@ -70,7 +98,24 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     
     var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "date", ascending: false)
     
+    var wv = 0
+    var bwv = 0
     
+    // ******************************************
+    @IBAction func calcButton(_ sender: Any) {
+        if Int(WVolume.text!) != nil {
+             wv = Int(WVolume.text!)!
+       //     print("wv = \(wv)")
+        }            // 廃液量
+        if Int(BfrWV.text!) != nil {
+            bwv = Int(BfrWV.text!)!
+        //    print("BfrWV = \(BfrWV)")
+        //    print("bwv = \(bwv)")
+        }
+        let rslt = wv - bwv
+        self.WVolume.text = rslt.description
+        
+    }
     // 注液時間の経過を表示
     @IBAction func beforeTimer(_ sender: Any) {
         passedTime()
@@ -81,18 +126,18 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         self.timer.invalidate()  // タイマーstop
         self.timer = nil
     }
-    
+    // ******************************************
     // 注液開始時間をタップで時間表示させる　入力済＞P1=1
     @IBAction func PStartTime(_ sender: Any) {
         PStart.setTitle(setTime(), for: UIControlState.normal)
-        PStartText = setTime()
+        PStartText = self.PStart.currentTitle!
         PStartT = Date()
         P1 = 1
         PStart.isEnabled = false
         PStart.setTitleColor(UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1), for: .normal)
         
-        print("PStart = \(PStartText)")
-        print("PStatT = \(PStartT)")
+        //print("PStart = \(PStartText)")
+        //print("PStatT = \(PStartT)")
         AudioServicesPlayAlertSound(1000)
         
         // 経過時間を表示
@@ -107,7 +152,8 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     // 注液終了時間をタップで時間表示させる　入力済＞P2=1
     @IBAction func PStopTime(_ sender: Any) {
         PStop.setTitle(setTime(), for: UIControlState.normal)
-        PStopText = setTime()
+        PStopText = self.PStop.currentTitle!
+//        p2Text = setTime()
         PStopT = Date()
         P2 = 1
         PStop.isEnabled = false
@@ -116,7 +162,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         if self.timer != nil {
             self.timer.invalidate()
             self.timer = nil
-            print("PStopTime = \(PStopText)")
+          //  print("PStopTime = \(PStopText)")
         }
         
         // 経過時間用のボタンを使用不可にする
@@ -128,11 +174,12 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         WStart.setTitle(setTime(), for: UIControlState.normal)
         WStartTex = setTime()
         WStartT = Date()
+//        w1Text = setTime()
         W1 = 1
         passedTime()    // 経過時間表示
         WStart.isEnabled = false
         WStart.setTitleColor(UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1), for: .normal)
-        print("WStartTime = \(WStartTex)")
+       // print("WStartTime = \(WStartTex)")
         BTimer.isEnabled = true   // 経過用ボタン使用可
         ATimer.isEnabled = true
     }
@@ -140,12 +187,13 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     @IBAction func WStopTime(_ sender: Any) {
         WStop.setTitle(setTime(), for: UIControlState.normal)
         WStopText = setTime()
+//        w2Text = setTime()
         WStopT = Date()
         W2 = 1
         if self.timer != nil {
             self.timer.invalidate()  // タイマーstop
             self.timer = nil
-            print("WStopTime = \(WStopText)")
+        //    print("WStopTime = \(WStopText)")
             WStop.isEnabled = false
             WStop.setTitleColor(UIColor(red: 0.1, green: 0.5, blue: 0.8, alpha: 1), for: .normal)
         }
@@ -153,11 +201,12 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         BTimer.isEnabled = false   // 経過用ボタン使用不可
         ATimer.isEnabled = false
     }
-    
+    // ******************************************
     // 注液開始時間を削除
     @IBAction func D1(_ sender: Any) {
         PStart.setTitle("注液開始", for: UIControlState.normal)
         PStartText = "注液開始"
+//        p1Text = ""
         PStartT = Date()
         P1 = 0
         passedTime()
@@ -168,6 +217,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     @IBAction func D2(_ sender: Any) {
         PStop.setTitle("注液終了", for: UIControlState.normal)
         PStopText = "注液終了"
+//        p2Text = ""
         PStopT = Date()
         P2 = 0
         passedTime()
@@ -178,6 +228,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     @IBAction func D3(_ sender: Any) {
         WStart.setTitle("廃液開始", for: UIControlState.normal)
         WStartTex = "廃液開始"
+//        w1Text = ""
         WStartT = Date()
         W1 = 0
         passedTime()
@@ -188,12 +239,13 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     @IBAction func D4(_ sender: Any) {
         WStop.setTitle("廃液終了", for: UIControlState.normal)
         WStopText = "廃液終了"
+ //       w2Text = ""
         WStopT = Date()
         W2 = 0
         passedTime()
         WStop.isEnabled = true
     }
-    
+    // ******************************************
     // 現在の時間をStringにする
     func setTime() -> String {
         let formatter = DateFormatter()
@@ -201,10 +253,10 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         return formatter.string(from: Date())
     }
     
-    
+    // ******************************************
     // 時間経過を1秒ごとにupdateTimeを動作させる
     func passedTime() {
-        print("DEBUG: passedTime")
+     //   print("DEBUG: passedTime")
         
         // 計測開始を設定
         if W1 == 0 && P1 != 0 { // PStartあり WStartなし
@@ -212,7 +264,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         } else {               // WStartあり
             uInfo = WStartT
         }
-        print("uInfo = \(uInfo)")
+       // print("uInfo = \(uInfo)")
         
         if self.timer == nil {
             self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTime), userInfo: nil, repeats: true)
@@ -221,11 +273,8 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
             self.timer = nil
         }
     }
-    /*
-     var PStartT = Date()!     var PStopT = Date()!
-     var WStartT = Date()!      var WStopT = Date()!
-     var PTime = Date()       var WTime = Date()
-     */
+
+    // ******************************************
     // 1秒毎に経過時間を表示させる
     func updateTime(timer: Timer) {
         // 現在日時
@@ -241,13 +290,40 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         } else {
             AftTimer.text = timeString
         }
-        if interval % 300 == 2 {
+        if interval % 300 == 60 {
             AudioServicesPlayAlertSound(1008)
         }
     }
     
+    // ******************************************
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        print("Scroll viewDidLoad data = \(data)")
+
+        //dateText: UITextField! //日付
+        //densityField: UITextField! //濃度
+        //pouringVField: UITextField! //注液量
+        //PStart: UIButton!  //注液開始
+        //PStop: UIButton!   //注液終了
+        //WStart: UIButton!  //排液開始
+        //WStop: UIButton!   //排液終了
+        //WVolume: UITextField!   //廃液量
+        //WCondition: UITextField! //廃液性状
+        //WeightField: UITextField! //体重
+        //commentField: UITextView! //血圧：
+        //BfrTimer: UILabel! //注液timer00:00
+        //AftTimer: UILabel! //排液timer00:00
+        
+        PStartT = data.startPouring
+        PStopT = data.stopPouring
+        WStartT = data.startWaste
+        WStopT = data.stopWaste
+
+        if navigationController != nil {
+            let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped(_:)))
+            navigationItem.rightBarButtonItem = doneButton
+        }
         
         // 背景をタップしたらdismissKeyboardメソッドを呼ぶ
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -284,31 +360,141 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         myDatePicker.datePickerMode = UIDatePickerMode.date
         dateText.inputView = myDatePicker
         
-        // 今日の日付を表示
-        let dateFormatter: DateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
+        // ナビゲータで遷移した場合
+        if navigationController != nil {
+            
+            print("nav で遷移")
+            
+            let dateFormatter: DateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy/MM/dd"
+            let y: String = dateFormatter.string(from: data.date)
+            
+            print("dataText_y = \(y)")
+            dateText.text = y as String
+
+            densityField.text = data.density
+            pouringVField.text = String(data.pouringVolume)
+            idText.text = String(data.id)
+            
+            let dateFormatter2: DateFormatter = DateFormatter()
+            dateFormatter2.dateFormat = "HH:mm:ss"
         
-        let selectDate: String = dateFormatter.string(from: Date())
-        dateText.text = selectDate as String
+            let startPS: String = dateFormatter2.string(from: data.startPouring)
+            PStart.setTitle(startPS, for: .normal)
+        
+            let stopPS: String = dateFormatter2.string(from: data.stopPouring)
+            PStop.setTitle(stopPS, for: .normal)
+            
+            let startWS: String = dateFormatter2.string(from: data.startWaste)
+            WStart.setTitle(startWS, for: .normal)
+            
+            let stopWS: String = dateFormatter2.string(from: data.stopWaste)
+            WStop.setTitle(stopWS, for: .normal)
+        
+            WVolume.text = String(data.wasteVolume)
+            WCondition.text = data.liquidWaste
+            WeightField.text = String(data.weight)
+            commentField.text = data.bloodPressure
+        
+            let interval1 = Int(data.stopPouring.timeIntervalSince(data.startPouring))
+        
+            let min1 = interval1 / 60
+            let sec1 = interval1 % 60
+            let timeString1 = String(format: "%02d:%02d", min1, sec1)
+            BfrTimer.text = timeString1
+            
+            print("BfrTimer = \(timeString1)")
+        
+            let interval2 = Int(data.stopWaste.timeIntervalSince(data.startWaste))
+        
+            let min2 = interval2 / 60
+            let sec2 = interval2 % 60
+            let timeString2 = String(format: "%02d:%02d", min2, sec2)
+            AftTimer.text = timeString2
+            print("AftTimer = \(timeString2)")
+        
+        } else {
+            dateText.text = data.findDate
+            idText.text = String(data.id)
+            print("nav 以外で遷移　scrollVC_dataText_x = \(x)")
+        }
         
         
         // Do any additional setup after loading the view.
     }
     
+    // ******************************************
     func dismissKeyboard(){
         // キーボードを閉じる
         view.endEditing(true)
     }
     
+    // ******************************************
+    // Doneボタンが押されたら呼ばれるメソッド
+    func doneTapped(_ sender: UINavigationController) {
+        // ToDo: 閉じる前に必要な処理があればここに記載
+        //if P2 == 1 || W2 == 1 {
+            print("realm add doneTapped")
+            try! realm.write {
+                _ = Data()
+                /*if rlmArray.count != 0 {
+                 self.data.id = rlmArray.max(ofProperty: "id")! + 1
+                 } */
+        //        print("data.id = \(self.data.id)")
+       //         self.data.date = Date()
+                self.data.findDate = dateText.text!  //日付
+                if let pVol = Int(pouringVField.text!) {
+                    self.data.pouringVolume = pVol
+                } else {
+                    self.data.pouringVolume = 0         //注液量
+                }
+                self.data.density = self.densityField.text!  // 透析液濃度
+                self.data.liquidWaste = self.WCondition.text! // 廃液の状態
+                self.data.bloodPressure = self.commentField.text // 血圧
+                if let wt = Double(WeightField.text!) {
+                    self.data.weight = wt                  // 体重
+                }
+                if let wVol = Int(WVolume.text!) {
+                    self.data.wasteVolume = wVol          // 廃液量
+                }
+
+                self.data.startPouring = PStartT as Date
+                self.data.stopPouring = PStopT as Date
+                self.data.startWaste = WStartT as Date
+                self.data.stopWaste = WStopT as Date
+                self.data.outletCondition = self.outletPicker.text!
+                self.data.difference = self.data.wasteVolume - self.data.pouringVolume
+                self.data.pouringTime = self.BfrTimer.text!
+                self.data.wasteTime = self.AftTimer.text!
+                self.data.pouringTime = self.BfrTimer.text!
+                self.data.wasteTime = self.AftTimer.text!
+                self.data.startPText = PStartText
+                self.data.stopPText = PStopText
+                self.data.startWText = w1Text
+                self.data.stopWText = w2Text
+ 
+                self.realm.add(self.data, update: true)
+                
+                //print(rlmArray)
+            //}
+        }
+        
+        
+        // 閉じる
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // ******************************************
     func changedDateEvent(sender: UIDatePicker) {
         let dateFormatter: DateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
         
         let selectDate: String = dateFormatter.string(from: sender.date)
-        print("DEBUG: dateText = \(selectDate)")
+        //print("DEBUG: dateText = \(selectDate)")
         dateText.text = selectDate as String
     }
     
+    // ******************************************
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -354,6 +540,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         }
     }
     
+    // ******************************************
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -380,40 +567,75 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
      var WStartT = Date()
      var WStopT = Date()
 */
+    // ******************************************    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        idText.text = String(data.id)
+        
+    }
+    
+    
+    // ******************************************
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+       // print("Scroll viewDidAppear x: \(x)")
+       // print("scrollVC_data.id = \(data.id)")
+       // print("scrollVC_count = \(rlmArray.count)")
+        if navigationController == nil {
+            self.dateText.text = x
+        }
+    
+    }
+    
+    // ******************************************
     override func viewDidDisappear(_ animated: Bool) {
+        //print("scroll_viewDidDisapper")
+        //print("PStart = \(String(describing: PStart.titleLabel))")
+        if P2 == 1 || W2 == 1 {
+          //  print("realm add")
         try! realm.write {
             _ = Data()
-            if rlmArray.count != 0 {
+            /*if rlmArray.count != 0 {
                 self.data.id = rlmArray.max(ofProperty: "id")! + 1
-            } else {
-                self.data.id = 1
-            }
-            print("data.id = \(self.data.id)")
-            self.data.date = Date()        //日付
+            } */
+            //print("data.id = \(self.data.id)")
+//            self.data.date = Date()
+            self.data.findDate = dateText.text!  //日付
             if let pVol = Int(pouringVField.text!) {
                 self.data.pouringVolume = pVol
             } else {
             self.data.pouringVolume = 0         //注液量
             }
-            self.data.density = densityField.text!  // 透析液濃度
-            self.data.liquidWaste = WCondition.text! // 廃液の状態
-            self.data.bloodPressure = commentField.text // 血圧
+            self.data.density = self.densityField.text!  // 透析液濃度
+            self.data.liquidWaste = self.WCondition.text! // 廃液の状態
+            self.data.bloodPressure = self.commentField.text // 血圧
             if let wt = Double(WeightField.text!) {
-                self.data.weight = wt
-            } else {
-                self.data.weight = 0.0                // 体重
-            }
+                self.data.weight = wt                  // 体重
+            } 
             if let wVol = Int(WVolume.text!) {
-                self.data.wasteVolume = wVol
-            } else {
-                self.data.wasteVolume = 0             // 廃液量
+                self.data.wasteVolume = wVol          // 廃液量
             }
-            self.data.startPouring = PStartT
-            self.data.stopPouring = PStopT
-            self.data.startWaste = WStartT
-            self.data.stopWaste = WStopT
-            self.data.outletCondition = outletPicker.text!
+            self.data.startPouring = PStartT as Date
+            
+            self.data.stopPouring = PStopT as Date
+            
+            self.data.startWaste = WStartT as Date
+            
+            self.data.stopWaste = WStopT as Date
+            
+            self.data.outletCondition = self.outletPicker.text!
             self.data.difference = self.data.wasteVolume - self.data.pouringVolume
+            self.data.pouringTime = self.BfrTimer.text!
+            self.data.wasteTime = self.AftTimer.text!
+            self.data.startPText = PStartText
+            self.data.stopPText = PStopText
+            self.data.startWText = w1Text
+            self.data.stopWText = w2Text
+
+            self.realm.add(self.data, update: true)
+            
+            //print(rlmArray)
+            }
 
         super.viewWillDisappear(animated)            
     }

@@ -10,6 +10,7 @@
 		36B0319D07366DF96D9942A1 /* Pods_PD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DC6F957DD920DFC8EB8B2AF /* Pods_PD.framework */; };
 		F30D5CA21FA741D8004AFF9C /* ScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */; };
 		F30D5CA51FAA0AE2004AFF9C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F30D5CA41FAA0AE2004AFF9C /* AudioToolbox.framework */; };
+		F311AD1D1FB5AD2D00B3CF83 /* addListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F311AD1C1FB5AD2D00B3CF83 /* addListViewController.swift */; };
 		F31E54BD1FA0B9AA00882568 /* densityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */; };
 		F31E54BE1FA0B9AA00882568 /* densityTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */; };
 		F31E54C11FA0BB9C00882568 /* volumeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */; };
@@ -50,6 +51,7 @@
 		6DC6F957DD920DFC8EB8B2AF /* Pods_PD.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PD.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollViewController.swift; sourceTree = "<group>"; };
 		F30D5CA41FAA0AE2004AFF9C /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		F311AD1C1FB5AD2D00B3CF83 /* addListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = addListViewController.swift; sourceTree = "<group>"; };
 		F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = densityTableViewCell.swift; sourceTree = "<group>"; };
 		F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = densityTableViewCell.xib; sourceTree = "<group>"; };
 		F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = volumeTableViewCell.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 				F3CFF9671F94E55B00521911 /* AppDelegate.swift */,
 				F3CFF9691F94E55B00521911 /* ViewController.swift */,
 				F3CFF96B1F94E55B00521911 /* Main.storyboard */,
+				F311AD1C1FB5AD2D00B3CF83 /* addListViewController.swift */,
 				F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */,
 				F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */,
 				F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */,
@@ -305,6 +308,7 @@
 				F30D5CA21FA741D8004AFF9C /* ScrollViewController.swift in Sources */,
 				F3A22B701F9B58FF00178E6A /* PDData.swift in Sources */,
 				F3CFF97A1F950F8600521911 /* HomeViewController.swift in Sources */,
+				F311AD1D1FB5AD2D00B3CF83 /* addListViewController.swift in Sources */,
 				F3CFF97C1F950FD700521911 /* MeasureViewController.swift in Sources */,
 				F346E2861F97A636007337FA /* Const.swift in Sources */,
 				F3A22B6C1F9A567900178E6A /* Cell.swift in Sources */,
