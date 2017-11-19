@@ -15,6 +15,8 @@
 		F31E54BE1FA0B9AA00882568 /* densityTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */; };
 		F31E54C11FA0BB9C00882568 /* volumeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */; };
 		F31E54C21FA0BB9C00882568 /* volumeTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F31E54C01FA0BB9C00882568 /* volumeTableViewCell.xib */; };
+		F32881151FBB417A004707CE /* StockTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32881131FBB417A004707CE /* StockTableViewCell.swift */; };
+		F32881161FBB417A004707CE /* StockTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F32881141FBB417A004707CE /* StockTableViewCell.xib */; };
 		F346E2861F97A636007337FA /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = F346E2851F97A636007337FA /* Const.swift */; };
 		F346E2881F97A806007337FA /* PostData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F346E2871F97A806007337FA /* PostData.swift */; };
 		F346E2931F991203007337FA /* PostTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F346E2911F991203007337FA /* PostTableViewCell.swift */; };
@@ -32,6 +34,7 @@
 		F3CFF9801F96413400521911 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CFF97F1F96413400521911 /* SettingViewController.swift */; };
 		F3CFF9821F976D0200521911 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F3CFF9811F976D0200521911 /* GoogleService-Info.plist */; };
 		F3CFF9841F97711F00521911 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CFF9831F97711F00521911 /* LoginViewController.swift */; };
+		F3DB46591FBFE0BF0007426D /* stockEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3DB46581FBFE0BF0007426D /* stockEditViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -56,6 +59,8 @@
 		F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = densityTableViewCell.xib; sourceTree = "<group>"; };
 		F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = volumeTableViewCell.swift; sourceTree = "<group>"; };
 		F31E54C01FA0BB9C00882568 /* volumeTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = volumeTableViewCell.xib; sourceTree = "<group>"; };
+		F32881131FBB417A004707CE /* StockTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StockTableViewCell.swift; sourceTree = "<group>"; };
+		F32881141FBB417A004707CE /* StockTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = StockTableViewCell.xib; sourceTree = "<group>"; };
 		F346E2851F97A636007337FA /* Const.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		F346E2871F97A806007337FA /* PostData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostData.swift; sourceTree = "<group>"; };
 		F346E2911F991203007337FA /* PostTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTableViewCell.swift; sourceTree = "<group>"; };
@@ -75,6 +80,7 @@
 		F3CFF97F1F96413400521911 /* SettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		F3CFF9811F976D0200521911 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F3CFF9831F97711F00521911 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		F3DB46581FBFE0BF0007426D /* stockEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = stockEditViewController.swift; sourceTree = "<group>"; };
 		F7FCD5891A83D745149915D5 /* Pods-PD.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PD.release.xcconfig"; path = "Pods/Target Support Files/Pods-PD/Pods-PD.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -133,6 +139,7 @@
 				F3CFF9671F94E55B00521911 /* AppDelegate.swift */,
 				F3CFF9691F94E55B00521911 /* ViewController.swift */,
 				F3CFF96B1F94E55B00521911 /* Main.storyboard */,
+				F3DB46581FBFE0BF0007426D /* stockEditViewController.swift */,
 				F311AD1C1FB5AD2D00B3CF83 /* addListViewController.swift */,
 				F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */,
 				F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */,
@@ -150,6 +157,8 @@
 				F3CFF97B1F950FD700521911 /* MeasureViewController.swift */,
 				F3CFF97D1F95101100521911 /* StockViewController.swift */,
 				F3CFF9791F950F8600521911 /* HomeViewController.swift */,
+				F32881131FBB417A004707CE /* StockTableViewCell.swift */,
+				F32881141FBB417A004707CE /* StockTableViewCell.xib */,
 				F3CFF96E1F94E55B00521911 /* Assets.xcassets */,
 				F3CFF9701F94E55B00521911 /* LaunchScreen.storyboard */,
 				F3CFF9731F94E55B00521911 /* Info.plist */,
@@ -239,6 +248,7 @@
 				F3CFF9821F976D0200521911 /* GoogleService-Info.plist in Resources */,
 				F3CFF96F1F94E55B00521911 /* Assets.xcassets in Resources */,
 				F346E2941F991203007337FA /* PostTableViewCell.xib in Resources */,
+				F32881161FBB417A004707CE /* StockTableViewCell.xib in Resources */,
 				F3CFF96D1F94E55B00521911 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,10 +312,12 @@
 				F3CFF9841F97711F00521911 /* LoginViewController.swift in Sources */,
 				F31E54BD1FA0B9AA00882568 /* densityTableViewCell.swift in Sources */,
 				F31E54C11FA0BB9C00882568 /* volumeTableViewCell.swift in Sources */,
+				F32881151FBB417A004707CE /* StockTableViewCell.swift in Sources */,
 				F346E2881F97A806007337FA /* PostData.swift in Sources */,
 				F3CFF96A1F94E55B00521911 /* ViewController.swift in Sources */,
 				F3CFF9681F94E55B00521911 /* AppDelegate.swift in Sources */,
 				F30D5CA21FA741D8004AFF9C /* ScrollViewController.swift in Sources */,
+				F3DB46591FBFE0BF0007426D /* stockEditViewController.swift in Sources */,
 				F3A22B701F9B58FF00178E6A /* PDData.swift in Sources */,
 				F3CFF97A1F950F8600521911 /* HomeViewController.swift in Sources */,
 				F311AD1D1FB5AD2D00B3CF83 /* addListViewController.swift in Sources */,

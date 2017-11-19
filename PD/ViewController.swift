@@ -95,9 +95,9 @@ class ViewController: UIViewController {
             scrollVC.data = self.data
             if self.rlmArray.count != 0 {
                 self.data.id = self.rlmArray.max(ofProperty: "id")! + 1
-            }
+            }     
             scrollVC.idText.text = String(scrollVC.data.id)
-            print("ViewC_tab4tapped id = \(self.data.id)")
+//            print("ViewC_tab4tapped id = \(self.data.id)")
         }, at: 4)
     }
     

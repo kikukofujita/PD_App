@@ -24,8 +24,8 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
     // Tableで使用する配列を定義
  //   let densityList: Array = ["0", "廃液", "1.5ダイアニール", "エクストラニール"]
  //   let volumeList: Array = ["0", "1500"]
-    var volArray = try! Realm().objects(ListV.self).sorted(byKeyPath: "listVolume", ascending: false)
-    var denArray = try! Realm().objects(ListD.self).sorted(byKeyPath: "id", ascending: false)
+    var volArray = try! Realm().objects(ListV.self).sorted(byKeyPath: "listVolume", ascending: true)
+    var denArray = try! Realm().objects(ListD.self).sorted(byKeyPath: "id", ascending: true)
     
     
     // Sectionで使用する配列を定義

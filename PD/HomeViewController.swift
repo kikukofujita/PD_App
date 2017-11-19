@@ -179,6 +179,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.idText.text = String(data.id)
         cell.weight.text = String(data.weight)
         cell.etc.text = data.bloodPressure
+        cell.etc.isEditable = false
+        cell.stockPlace.text = data.stockPlace
 
 /*        let formatter2 = DateFormatter()
         formatter2.dateFormat = "yyyy/MM/dd"
@@ -186,7 +188,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.fDateText.text = fd   */
         cell.fDateText.text = data.findDate
         cell.differenceText.text = String(data.difference)
-        cell.totalVText.text = totalVolume()
         
         _ = data.weight.description
 //        etc.text =  (bp) + "\n" +  (data.bloodPressure)
@@ -209,7 +210,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         present(ScrollViewController, animated: true, completion: nil)  */
     }
     
-    // セルが削除可能
+    // セルが削除可能 > 不可
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
         //return UITableViewCellEditingStyle.delete
         if tableView.isEditing {
@@ -279,7 +280,9 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         // dataの配列から、differenceの合計を計算
         rlmArray.forEach { (data:Data) in
-            total += data.difference
+            if data.pouringVolume != 0 {
+                total += data.difference
+            }
         }
         print("total: \(String(total))")
         return String(total)
@@ -308,6 +311,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
+        self.totalVolLabel.text = totalVolume()
         
     }
 

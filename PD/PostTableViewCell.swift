@@ -19,15 +19,12 @@ class PostTableViewCell: UITableViewCell {
     @IBOutlet weak var WtimeLabel: UILabel!
     @IBOutlet weak var WVolumeLabel: UILabel!
     @IBOutlet weak var wasteLabel: UILabel!
-    @IBOutlet weak var etc: UILabel!
+    @IBOutlet weak var etc: UITextView!
     @IBOutlet weak var weight: UILabel!
     @IBOutlet weak var fDateText: UILabel!
     @IBOutlet weak var idText: UILabel!
     @IBOutlet weak var differenceText: UILabel!
-    @IBOutlet weak var totalVText: UILabel!
-
-    @IBAction func button(_ sender: Any) {
-    }
+    @IBOutlet weak var stockPlace: UILabel!
 
     override func awakeFromNib() {
         super.awakeFromNib()

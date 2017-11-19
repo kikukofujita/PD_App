@@ -62,6 +62,18 @@ class addListViewController: UIViewController {
         // 背景をタップしたらdismissKeyboardメソッドを呼ぶ
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         self.view.addGestureRecognizer(tapGesture)
+        
+        listD = ListD()
+        listD.id = 0
+        if listDArray.count == 0 {
+            try! realm.write {
+                listD.listDensity = "キャップ"
+                self.realm.add(self.listD, update: true)
+            }
+        }
+        print("listDArray: \(listDArray)")
+        self.densityText.text = ""
+
 
         // Do any additional setup after loading the view.
     }

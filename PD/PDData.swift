@@ -45,6 +45,8 @@ class Data: Object {
     
     dynamic var stock = 0             // 在庫
     
+    dynamic var stockPlace = ""       //　在庫場所
+    
     
     // id = プライマリーキー
     override static func primaryKey() -> String? {
@@ -60,6 +62,21 @@ class ListD: Object {
     
     // 濃度の選択肢
     dynamic var listDensity = ""
+    
+    // home　入庫総数
+    dynamic var homeAllStock = 0
+    
+    // other 入庫総数
+    dynamic var otherAllStock = 0
+    
+    // home　入庫予定日
+    dynamic var homeDate = Date()
+    
+    // home 履歴
+    dynamic var home = ""
+    
+    // other 履歴
+    dynamic var other = ""
     
     // id = primary key
     override static func primaryKey() -> String? {
