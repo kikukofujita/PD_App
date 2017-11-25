@@ -11,6 +11,7 @@ import RealmSwift
 import Firebase
 import FirebaseAuth
 import ESTabBarController
+import SVProgressHUD
 
 class ViewController: UIViewController {
     
@@ -33,7 +34,7 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-/*   ログイン画面を表示しない　ー＞　realmで作成するため
+//   ログイン画面を表示しない　ー＞　realmで作成するため
         // currentUserがnilならログインしてない
         if Auth.auth().currentUser == nil {
             // ログインしてない時の処理
@@ -42,7 +43,7 @@ class ViewController: UIViewController {
                 let loginViewController = self.storyboard?.instantiateViewController(withIdentifier: "Login")
                 self.present(loginViewController!, animated: true, completion: nil)
             }
-        }*/
+        }
     }
     
     func setupTab() {
@@ -50,7 +51,7 @@ class ViewController: UIViewController {
         print("DBUG: setupTab")
         
         // 画像のファイル名を指定してESTabBarControllerを作成する
-        let tabBarController: ESTabBarController! = ESTabBarController(tabIconNames: ["home", "measure", "stock", "setting", "measure"])
+        let tabBarController: ESTabBarController! = ESTabBarController(tabIconNames: ["home", "New", "stock", "setting"])
         
         // 背景色、選択時の色を設定する
         tabBarController.selectedColor = UIColor(red: 1.0, green: 0.44, blue: 1.0, alpha: 1)
@@ -65,15 +66,15 @@ class ViewController: UIViewController {
         // タブをタップしたときに表示するViewControllerを設定する
         let homeViewController = storyboard?.instantiateViewController(withIdentifier: "Home")
         let settingViewController = storyboard?.instantiateViewController(withIdentifier: "Setting")
-        let measureViewController = storyboard?.instantiateViewController(withIdentifier: "Measure")
+ //       let measureViewController = storyboard?.instantiateViewController(withIdentifier: "Measure")
         let stockViewController = storyboard?.instantiateViewController(withIdentifier: "Stock")
         let scrollViewController = storyboard?.instantiateViewController(withIdentifier: "Scroll")
         
         tabBarController.setView(homeViewController, at: 0)
-        tabBarController.setView(measureViewController, at: 1)
+//        tabBarController.setView(measureViewController, at: 1)
         tabBarController.setView(settingViewController, at: 3)
         tabBarController.setView(stockViewController, at: 2)
-        tabBarController.setView(scrollViewController, at: 4)
+        tabBarController.setView(scrollViewController, at: 1)
         
        // ハイライトタブ
         tabBarController.highlightButton(at: 1)
@@ -94,11 +95,11 @@ class ViewController: UIViewController {
             print("ViewC_tab4tapped count = \(self.rlmArray.count)")
             scrollVC.data = self.data
             if self.rlmArray.count != 0 {
-                self.data.id = self.rlmArray.max(ofProperty: "id")! + 1
+      //          self.data.id = self.rlmArray.max(ofProperty: "id")! + 1
             }     
             scrollVC.idText.text = String(scrollVC.data.id)
 //            print("ViewC_tab4tapped id = \(self.data.id)")
-        }, at: 4)
+        }, at: 1)
     }
     
 /*    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

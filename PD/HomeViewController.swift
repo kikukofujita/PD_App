@@ -36,7 +36,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     // Realmインスタンス取得
     let realm = try! Realm()
     
-    var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "startPouring", ascending: false)
+    var rlmArray = try! Realm().objects(Data.self).sorted(byKeyPath: "startPouring", ascending: true)
     
     
     var data: Data!
@@ -300,6 +300,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                     
            //         scrollVC.x = self.textField.text!
                     scrollVC.data = rlmArray[indexPath!.row]
+                    scrollVC.postdata = postData
+                    print("HomeVC: postData  \(postData)")
                     
                     print("toScroll によるSegue")
                     print("toScroll data = \(rlmArray[indexPath!.row])")

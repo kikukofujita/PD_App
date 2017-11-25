@@ -35,6 +35,7 @@ class StockViewController: UIViewController, UITableViewDelegate, UITableViewDat
         tableView.delegate = self
         tableView.dataSource = self
         
+        
         // テーブルセルのタップを無効にする
         //tableView.allowsSelection = false
         

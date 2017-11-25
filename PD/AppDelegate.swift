@@ -54,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-    // アプリガフォアグラウンドの時に通知を受け取ると呼ばれるメソッド
+    // アプリがフォアグラウンドの時に通知を受け取ると呼ばれるメソッド
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notificaiton: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.sound, .alert])
         

@@ -141,7 +141,6 @@
 				F3CFF96B1F94E55B00521911 /* Main.storyboard */,
 				F3DB46581FBFE0BF0007426D /* stockEditViewController.swift */,
 				F311AD1C1FB5AD2D00B3CF83 /* addListViewController.swift */,
-				F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */,
 				F31E54BB1FA0B9AA00882568 /* densityTableViewCell.swift */,
 				F31E54BC1FA0B9AA00882568 /* densityTableViewCell.xib */,
 				F31E54BF1FA0BB9C00882568 /* volumeTableViewCell.swift */,
@@ -161,6 +160,7 @@
 				F32881141FBB417A004707CE /* StockTableViewCell.xib */,
 				F3CFF96E1F94E55B00521911 /* Assets.xcassets */,
 				F3CFF9701F94E55B00521911 /* LaunchScreen.storyboard */,
+				F30D5CA11FA741D8004AFF9C /* ScrollViewController.swift */,
 				F3CFF9731F94E55B00521911 /* Info.plist */,
 				F3CFF9811F976D0200521911 /* GoogleService-Info.plist */,
 			);

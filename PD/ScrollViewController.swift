@@ -10,9 +10,14 @@ import UIKit
 import RealmSwift
 import AudioToolbox
 import UserNotifications
+import SVProgressHUD
+import Firebase
+import FirebaseAuth
+import FirebaseDatabase
 
 class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource,UITextViewDelegate {
 
+    @IBOutlet weak var uidText: UILabel!
     @IBOutlet weak var WVolume: UITextField!   //廃液量
     @IBOutlet weak var WCondition: UITextField! //廃液性状
     @IBOutlet weak var WeightField: UITextField! //体重
@@ -32,7 +37,72 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     @IBOutlet weak var BfrWV: UITextField!
     @IBOutlet weak var idText: UILabel!
     @IBOutlet weak var stockText: UILabel!
+    @IBOutlet weak var datePicker: UIDatePicker!
     
+    @IBOutlet weak var segmentControll: UISegmentedControl!
+    
+    @IBAction func changedTime(_ sender: Any) {
+        let selectedIndex = segmentControll.selectedSegmentIndex
+        let d:String = DatetoString(datePicker.date)
+        
+        switch selectedIndex {
+        case 0:
+            PStart.setTitle(d, for: UIControlState.normal)
+            PStartText = d
+            PStartT = datePicker.date
+            let interval1 = Int(PStopT.timeIntervalSince(PStartT))
+            let min1 = interval1 / 60
+            let sec1 = interval1 % 60
+            let timeString1 = String(format: "%02d:%02d", min1, sec1)
+            BfrTimer.text = timeString1
+        case 1:
+            PStop.setTitle(d, for: UIControlState.normal)
+            PStopText = d
+            PStopT = datePicker.date
+            let interval1 = Int(PStopT.timeIntervalSince(PStartT))
+            let min1 = interval1 / 60
+            let sec1 = interval1 % 60
+            let timeString1 = String(format: "%02d:%02d", min1, sec1)
+            BfrTimer.text = timeString1
+        case 2:
+            WStart.setTitle(d, for: UIControlState.normal)
+            WStartTex = d
+            WStartT = datePicker.date
+            let interval2 = Int(WStopT.timeIntervalSince(WStartT))
+            let min2 = interval2 / 60
+            let sec2 = interval2 % 60
+            let timeString2 = String(format: "%02d:%02d", min2, sec2)
+            AftTimer.text = timeString2
+        case 3:
+            WStop.setTitle(d, for: UIControlState.normal)
+            WStopText = d
+            WStopT = datePicker.date
+            let interval2 = Int(WStopT.timeIntervalSince(WStartT))
+            let min2 = interval2 / 60
+            let sec2 = interval2 % 60
+            let timeString2 = String(format: "%02d:%02d", min2, sec2)
+            AftTimer.text = timeString2
+        default : break
+        }
+        SVProgressHUD.showSuccess(withStatus: "時間を変更しました")
+    }
+
+    
+    @IBAction func selectTime(_ sender: UISegmentedControl) {
+        // セグメント番号で時間を表示
+        switch sender.selectedSegmentIndex {
+        case 0:
+            datePicker.date = PStartT as Date
+        case 1:
+            datePicker.date = PStopT as Date
+        case 2:
+            datePicker.date = WStartT as Date
+        case 3:
+            datePicker.date = WStopT as Date
+        default:
+            datePicker.date = Date()
+        }
+    }
     @IBAction func selectStock(_ sender: UISegmentedControl) {
         // セグメント番号でストック場所を表示
         switch sender.selectedSegmentIndex {
@@ -51,7 +121,10 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     var listD = ListD()
     var listV = ListV()
 //    var rlmArray: [Data] = []
-    var dataArray: [PostData] = []
+    var postArray: [PostData] = []
+    
+    // DatabaseのobserveEventの登録状態を表す
+    var observing = false
 
     var PStartText = ""      //表示用
     var PStopText = ""
@@ -172,6 +245,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         // 経過時間用のボタンを使用可能にする
             BTimer.isEnabled = true
             ATimer.isEnabled = true
+            
         }
     }
     
@@ -203,6 +277,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     
     @IBAction func WStartTime(_ sender: Any) {
         if WStart.titleLabel!.text == "排液開始" {
+            print("排液開始をタップ")
             WStart.setTitle(setTime(), for: UIControlState.normal)
             WStartTex = setTime()
             WStartT = Date()
@@ -218,12 +293,20 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
             // ローカル通知をキャンセル
             let center = UNUserNotificationCenter.current()
             center.removePendingNotificationRequests(withIdentifiers: [String(data.id) + "1"])
-           center.removePendingNotificationRequests(withIdentifiers: [String(data.id) + "2"])
+            center.removePendingNotificationRequests(withIdentifiers: [String(data.id) + "2"])
+            //未通知のローカル通知一覧
+            center.getPendingNotificationRequests{ (requests: [UNNotificationRequest]) in
+                for request in requests {
+                    print("/--------------")
+                    print(request)
+                    print("/--------------")
+                }
+            }
         }
     }
     
     @IBAction func WStopTime(_ sender: Any) {
-        if WStop.titleLabel!.text == "廃液終了" {
+        if WStop.titleLabel!.text == "排液終了" {
             WStop.setTitle(setTime(), for: UIControlState.normal)
         WStopText = setTime()
 //        w2Text = setTime()
@@ -262,12 +345,25 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         P2 = 0
         passedTime()
         PStop.isEnabled = true
+        
+        // ローカル通知をキャンセル
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [String(data.id) + "1"])
+        center.removePendingNotificationRequests(withIdentifiers: [String(data.id) + "2"])
+        //未通知のローカル通知一覧
+        center.getPendingNotificationRequests{ (requests: [UNNotificationRequest]) in
+            for request in requests {
+                print("/--------------")
+                print(request)
+                print("/--------------")
+            }
+        }
     }
     
     // 排液開始時間を削除
     @IBAction func D3(_ sender: Any) {
-        WStart.setTitle("廃液開始", for: UIControlState.normal)
-        WStartTex = "廃液開始"
+        WStart.setTitle("排液開始", for: UIControlState.normal)
+        WStartTex = "排液開始"
 //        w1Text = ""
         WStartT = Date()
         W1 = 0
@@ -277,8 +373,8 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     
     // 排液終了時間を削除
     @IBAction func D4(_ sender: Any) {
-        WStop.setTitle("廃液終了", for: UIControlState.normal)
-        WStopText = "廃液終了"
+        WStop.setTitle("排液終了", for: UIControlState.normal)
+        WStopText = "排液終了"
  //       w2Text = ""
         WStopT = Date()
         W2 = 0
@@ -325,9 +421,9 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         let sec = interval % 60
         let timeString = String(format: "%02d:%02d", min, sec)
         
-        if W1 == 0 {
+        if P1 == 1 && P2 + W1 + W2 == 0 {
             BfrTimer.text = timeString
-        } else {
+        } else if P1 + P2 + W1 == 3 && W2 == 0 {
             AftTimer.text = timeString
         }
         //  1分後にアラーム、その後５分毎にアラーム
@@ -341,6 +437,31 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         super.viewDidLoad()
 
         print("Scroll viewDidLoad data = \(data)")
+        
+/*        if Auth.auth().currentUser != nil {
+            if self.observing == false {
+                let postRef = Database.database().reference().child(Const.PostPath)
+                postRef.observe(.childAdded, with: { snapshot in
+                    if let uid = Auth.auth().currentUser?.uid {
+                        let postData = PostData(snapshot: snapshot, myId: uid)
+                        self.postArray.insert(postData, at: 0)
+                    }
+                    })
+                }
+            
+        }
+        
+        let postRef2 = Database.database().reference().child("posts").queryEqual(toValue: data.firebaseKey, childKey: "uniqueId")
+//        let postRef3 = Database.database().reference().child("posts").queryEqual(toValue: data.firebaseKey, childKey: "uniqueId")
+        postRef2.observe(.childAdded, with: { snapshot in
+            // PostDataクラスを生成し受け取ったデータを設定
+            if let uid = Auth.auth().currentUser?.uid {
+                let postData = PostData(snapshot: snapshot, myId: uid)
+                self.postArray.insert(postData, at: 0)
+                print("postArray = \(self.postArray)")
+            }
+        })
+*/
 
         //dateText: UITextField! //日付
         //densityField: UITextField! //濃度
@@ -413,7 +534,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
             
             print("dataText_y = \(y)")
             dateText.text = y as String
-
+            uidText.text = data.firebaseKey
             densityField.text = data.density
             pouringVField.text = String(data.pouringVolume)
             idText.text = String(data.id)
@@ -432,10 +553,13 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
             
             let stopWS: String = dateFormatter2.string(from: data.stopWaste)
             WStop.setTitle(stopWS, for: .normal)
-        
-            WVolume.text = String(data.wasteVolume)
+            if data.wasteVolume != 0 {
+                WVolume.text = String(data.wasteVolume)
+            }
             WCondition.text = data.liquidWaste
-            WeightField.text = String(data.weight)
+            if data.weight != 0.0 {
+                WeightField.text = String(data.weight)
+            }
             commentField.text = data.bloodPressure
             stockText.text = data.stockPlace
         
@@ -455,6 +579,19 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
             let timeString2 = String(format: "%02d:%02d", min2, sec2)
             AftTimer.text = timeString2
             print("AftTimer = \(timeString2)")
+            if Auth.auth().currentUser != nil {
+                if observing == false {
+                    let postRef = Database.database().reference().child(Const.PostPath)
+                    postRef.observe(.childAdded, with: { snapshot in
+                        if let uid = Auth.auth().currentUser?.uid {
+                            let postData = PostData(snapshot: snapshot, myId: uid)
+                            self.postArray.insert(postData, at: 0)
+                            print("postArray = \(self.postArray)")
+                        }
+                        
+                        })
+                }
+            }
         
         } else {
             dateText.text = data.findDate
@@ -503,58 +640,103 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     }
     
     // ******************************************
-    // Doneボタンが押されたら呼ばれるメソッド
+    // Doneボタンが押されたら呼ばれるメソッド  > データを更新
     func doneTapped(_ sender: UINavigationController) {
         // ToDo: 閉じる前に必要な処理があればここに記載
-        //if P2 == 1 || W2 == 1 {
-            print("realm add doneTapped")
-            try! realm.write {
-                _ = Data()
+        print("realm add doneTapped")
+        
+        let baseRef = Database.database().reference().child("posts")
+        
+        let postRef = baseRef.queryOrdered(byChild: "uniqueId").queryEqual(toValue: data.firebaseKey)
+        
+        postRef.observeSingleEvent(of: .value, with: { snapshot in
+            if let matched = snapshot.value as? [String: AnyObject] {
+                for key in matched.keys {
+                    let wVol = (self.WVolume.text == "" ? 0 : Int(self.WVolume.text!)!)
+                    let pVol = (self.pouringVField.text == "" ? 0 : Int(self.pouringVField.text!)!)
+                    let df = (pVol == 0 ? 0 :wVol - pVol)
+                    let w = (self.WeightField.text == "" ? 0.0 : Double(self.WeightField.text!)!)
+                    
+                    let updated = ["time": self.dateText.text!,
+                                   "density": self.densityField.text!,
+                                   "stopPtime": self.PStop.titleLabel?.text! ?? "",
+                                   "startWtime": self.WStart.titleLabel?.text! ?? "",
+                                   "difference": df,
+                                   "waste": self.WCondition.text!,
+                                   "outlet": self.outletPicker.text!,
+                                   "weight": w,
+                                   "BP": self.commentField.text!,
+                                   "stockPlace": self.stockText.text!] as [String : Any]
+                    baseRef.child(key).updateChildValues(updated)
+                    
+                    print("matched = \(matched)")
+                }
+            }
+        })
+        
+
+//        postRef2.updateChildValues(postData)
+        
+        
+/*        let postRef = Database.database().reference().child(Const.PostPath).child(data.firebaseKey)
+        let postDatas = ["email": postdata.email ?? e, "date": postdata.date ?? data.findDate, "density": postdata.density ?? data.density, "stopPouring": postdata.stopPouring ?? data.stopPText, "startWaste": postdata.startWaste ?? data.startWText, "difference": postdata.difference ?? data.difference, ",WasteState": postdata.liquidWaste ?? data.liquidWaste, "outlet": postdata.outletCondition ?? data.outletCondition, "weight": postdata.weight ?? data.weight, "bloodPressure": postdata.bloodPressure ?? data.bloodPressure] as [String : Any]
+        postRef.updateChildValues(postDatas)
+ */       
+        try! realm.write {
+            _ = Data()
                 /*if rlmArray.count != 0 {
                  self.data.id = rlmArray.max(ofProperty: "id")! + 1
                  } */
+            self.data.firebaseKey = uidText.text!
                 
-                self.data.findDate = dateText.text!  //日付
-                if let pVol = Int(pouringVField.text!) {
-                    self.data.pouringVolume = pVol
-                } else {
-                    self.data.pouringVolume = 0         //注液量
-                }
-                self.data.density = self.densityField.text!  // 透析液濃度
-                self.data.liquidWaste = self.WCondition.text! // 廃液の状態
-                self.data.bloodPressure = self.commentField.text // 血圧
-                if let wt = Double(WeightField.text!) {
-                    self.data.weight = wt                  // 体重
-                }
-                if let wVol = Int(WVolume.text!) {
-                    self.data.wasteVolume = wVol          // 廃液量
-                }
+            self.data.findDate = dateText.text!  //日付
+            if let pVol = Int(pouringVField.text!) {
+                self.data.pouringVolume = pVol
+            } else {
+                self.data.pouringVolume = 0         //注液量
+            }
+            self.data.density = self.densityField.text!  // 透析液濃度
+            self.data.liquidWaste = self.WCondition.text! // 廃液の状態
+            self.data.bloodPressure = self.commentField.text // 血圧
+            if let wt = Double(WeightField.text!) {
+                self.data.weight = wt                  // 体重
+            }
+            if let wVol = Int(WVolume.text!) {
+                self.data.wasteVolume = wVol          // 廃液量
+            }
 
-                self.data.startPouring = PStartT as Date
-                self.data.stopPouring = PStopT as Date
-                self.data.startWaste = WStartT as Date
-                self.data.stopWaste = WStopT as Date
-                self.data.outletCondition = self.outletPicker.text!
-                self.data.difference = self.data.wasteVolume - self.data.pouringVolume
-                self.data.pouringTime = self.BfrTimer.text!
-                self.data.wasteTime = self.AftTimer.text!
-                self.data.pouringTime = self.BfrTimer.text!
-                self.data.wasteTime = self.AftTimer.text!
-                self.data.startPText = PStartText
-                self.data.stopPText = PStopText
-                self.data.startWText = w1Text
-                self.data.stopWText = w2Text
-                if self.stockText.text != "" {
-                    self.data.stockPlace = self.stockText.text!
-                } else {
-                    self.data.stockPlace = "home"
-                }
+            self.data.startPouring = PStartT as Date
+            self.data.stopPouring = PStopT as Date
+            self.data.startWaste = WStartT as Date
+            self.data.stopWaste = WStopT as Date
+            self.data.outletCondition = self.outletPicker.text!
+            self.data.difference = self.data.wasteVolume - self.data.pouringVolume
+            
+            let interval1 = Int(data.stopPouring.timeIntervalSince(data.startPouring))
+            let min1 = interval1 / 60
+            let sec1 = interval1 % 60
+            let timeString1 = String(format: "%02d:%02d", min1, sec1)
+            
+            let interval2 = Int(data.stopWaste.timeIntervalSince(data.startWaste))
+            let min2 = interval2 / 60
+            let sec2 = interval2 % 60
+            let timeString2 = String(format: "%02d:%02d", min2, sec2)
+            
+            self.data.pouringTime = timeString1
+            self.data.wasteTime = timeString2
+            self.data.pouringTime = self.BfrTimer.text!
+            self.data.wasteTime = self.AftTimer.text!
+            self.data.startPText = PStartText
+            self.data.stopPText = PStopText
+            self.data.startWText = w1Text
+            self.data.stopWText = w2Text
+            if self.stockText.text != "" {
+                self.data.stockPlace = self.stockText.text!
+            } else {
+                self.data.stockPlace = "home"
+            }
  
-                self.realm.add(self.data, update: true)
-                
-                
-                
-                
+            self.realm.add(self.data, update: true)
         }
         
         
@@ -650,10 +832,6 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
         super.viewWillAppear(animated)
         idText.text = String(data.id)
         
-        //print("vWA_densityList:  \(densityList)")
-      //  print("vWA_volumeList:  \(volumeList)")
-        
-        
     }
     
     
@@ -674,57 +852,166 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
 
         print("ScrollVC viewWillDisappear でrealm add")
         print("tab 4 tapped時にidは設定済み")
-        if P2 == 1 || W2 == 1 {
-          
-            try! realm.write {
-                _ = Data()
-            /*if rlmArray.count != 0 {
-                self.data.id = rlmArray.max(ofProperty: "id")! + 1
-            } */
-            //print("data.id = \(self.data.id)")
-//            self.data.date = Date()
-                self.data.findDate = dateText.text!  //日付
-                if let pVol = Int(pouringVField.text!) {
-                self.data.pouringVolume = pVol
-            } else {
-                    self.data.pouringVolume = 0         //注液量
-                }
-            self.data.density = self.densityField.text!  // 透析液濃度
-            self.data.liquidWaste = self.WCondition.text! // 廃液の状態
-            self.data.bloodPressure = self.commentField.text // 血圧
-            if let wt = Double(WeightField.text!) {
-                self.data.weight = wt                  // 体重
-            } 
-            if let wVol = Int(WVolume.text!) {
-                self.data.wasteVolume = wVol          // 廃液量
-            }
-            self.data.startPouring = PStartT as Date
-            
-            self.data.stopPouring = PStopT as Date
-            
-            self.data.startWaste = WStartT as Date
-            
-            self.data.stopWaste = WStopT as Date
-            
-            self.data.outletCondition = self.outletPicker.text!
-            self.data.difference = self.data.wasteVolume - self.data.pouringVolume
-            self.data.pouringTime = self.BfrTimer.text!
-            self.data.wasteTime = self.AftTimer.text!
-            self.data.startPText = PStartText
-            self.data.stopPText = PStopText
-            self.data.startWText = w1Text
-            self.data.stopWText = w2Text
-                if self.stockText.text != "" {
-                self.data.stockPlace = self.stockText.text!
-                } else {
-                    self.data.stockPlace = "home"
-                }
+        
+        // ナビゲータで遷移していない場合  新規レコード作成
+        if navigationController == nil {
+            if (PStop.titleLabel!.text != "注液終了" || WStop.titleLabel!.text != "排液終了" || densityField.text != "") {
+                print("ナビゲータ以外　viewWillDisappear")
+                // ***************************
+                // postDataに必要な情報を取得
+//                let user = Auth.auth().currentUser?.uid
+                let email = Auth.auth().currentUser?.email
+                let wVol = (WVolume.text == "" ? 0 : Int(WVolume.text!)!)
+                
+                let pVol = (pouringVField.text == "" ? 0 : Int(pouringVField.text!)!)
+                
+                let df = (pVol == 0 ? 0 :wVol - pVol)
+                
+                let e = (email == nil ? "" : email!)
+                let w = (WeightField.text == "" ? 0.0 : Double(WeightField.text!)!)
+                let uuid = NSUUID().uuidString + e
+                
+                // 辞書を作成してFirebaseに保存する
+                let postRef = Database.database().reference().child(Const.PostPath)
+                let postData = ["uniqueId": uuid,
+                                "email": e,
+                                "time": self.dateText.text!,
+                                "density": self.densityField.text!,
+                                "stopPtime": self.PStop.titleLabel?.text! ?? "",
+                                "startWtime": self.WStart.titleLabel?.text! ?? "",
+                                "difference": df,
+                                "waste": self.WCondition.text!,
+                                "outlet": self.outletPicker.text!,
+                                "weight": w,
+                                "BP": self.commentField.text!,
+                                "stockPlace": self.stockText.text!] as [String : Any]
 
-            self.realm.add(self.data, update: true)
+                print("Firebase: 書き込み")
+                print(postData)
+                postRef.childByAutoId().setValue(postData)
+                
+                try! realm.write {
+                    _ = Data()
+                    if rlmArray.count != 0 {
+                        self.data.id = rlmArray.max(ofProperty: "id")! + 1
+                    }
+                    self.data.firebaseKey = uuid
+
+                    self.data.findDate = dateText.text!  //日付
+                    if let pVol = Int(pouringVField.text!) {
+                        self.data.pouringVolume = pVol
+                    } else {
+                        self.data.pouringVolume = 0         //注液量
+                    }
+                    self.data.density = self.densityField.text!  // 透析液濃度
+                    self.data.liquidWaste = self.WCondition.text! // 廃液の状態
+                    self.data.bloodPressure = self.commentField.text // 血圧
+                    if let wt = Double(WeightField.text!) {
+                        self.data.weight = wt        // 体重
+                    }
+                    if let wVol = Int(WVolume.text!) {
+                        self.data.wasteVolume = wVol // 廃液量
+                    }
+                    self.data.startPouring = PStartT as Date
+            
+                    self.data.stopPouring = PStopT as Date
+            
+                    self.data.startWaste = WStartT as Date
+            
+                    self.data.stopWaste = WStopT as Date
+            
+                    self.data.outletCondition = self.outletPicker.text!
+                    self.data.difference = self.data.wasteVolume - self.data.pouringVolume
+                    self.data.pouringTime = self.BfrTimer.text!
+                    self.data.wasteTime = self.AftTimer.text!
+                    self.data.startPText = PStartText
+                    self.data.stopPText = PStopText
+                    self.data.startWText = w1Text
+                    self.data.stopWText = w2Text
+                    if self.stockText.text != "" {
+                        self.data.stockPlace = self.stockText.text!
+                    } else {
+                        self.data.stockPlace = "home"
+                    }
+
+                    self.realm.add(self.data, update: true)
+                }
             }
+        
+            setNotification(data: data)
         }
         
-        setNotification(data: data)
+/*        // ************************************
+        if Auth.auth().currentUser != nil {
+            if self.observing == false {
+         // 要素が追加されたらpostArrayに追加する
+                let postsRef = Database.database().reference().child(Const.PostPath)
+                postsRef.observe(.childAdded, with: { snapshot in
+         
+         // PostDataクラスを生成して受け取ったデータを設定する
+         if let uid = Auth.auth().currentUser?.uid {
+         let postData = PostData(snapshot: snapshot, myId: uid)
+         self.postArray.insert(postData, at: 0)
+         
+         }
+         })
+         // 要素が変更されたら街灯のデータをpostArrayから一度削除したのちに新しいデータを追加する
+         postsRef.observe(.childChanged, with: { snapshot in
+         print("DEBUG_PRINT: .childChangedイベントが発生しました。")
+         if let uid = Auth.auth().currentUser?.uid {
+         // PostDataクラスを生成して受け取ったデータを設定。
+         let postData = PostData(snapshot: snapshot, myId: uid)
+         // 保持している配列からidが同じものを探す
+         var index: Int = 0
+         for post in self.postArray {
+         if post.id == postData.id {
+         index = self.postArray.index(of: post)!
+         break
+         }
+         }
+         
+         // 差し替えるため一度削除する
+         self.postArray.remove(at: index)
+         
+         // 削除したところに更新済みのデータを追加する
+         self.postArray.insert(postData, at: index)
+         }
+         })
+         // DatabaseのobserveEventが上記コードにより登録されたためtrueとする
+         observing = true
+         }
+         } else {
+         if observing == true {
+         // ログアウトを検出したら一旦クリアしてオブザーバを削除
+         postArray = []
+         
+         // オブザーバを削除
+         Database.database().reference().removeAllObservers()
+         
+         // DatabaseのobserveEventが上記コードにより解除されたためfalseとする
+         observing = false
+         }
+         }*/
+ 
+/*        // ***************************
+        // postDataに必要な情報を取得
+        let user = Auth.auth().currentUser?.uid
+        let email = Auth.auth().currentUser?.email
+        let df = Int(WVolume.text!)! - Int(pouringVField.text!)!
+        let e = (email == nil ? "" :email!)
+        let w = (WeightField.text == "" ? 0 : Int(WeightField.text!)!)
+        
+        
+        // 辞書を作成してFirebaseに保存する
+        let postRef = Database.database().reference().child(Const.PostPath)
+        let postData = ["email": e, "time": data.findDate, "density": data.density, "stopPtiem": data.stopPText, "startWtime": data.startWText, "difference": df, "waste": data.wasteVolume, "outlet": data.outletCondition, "weight": w, "BP": data.bloodPressure] as [String : Any]
+
+        print("後でFirebase: 書き込み")
+        print(postData)
+        postRef.childByAutoId().setValue(postData)
+        
+        
+*/
         
         super.viewWillDisappear(animated)
     }
@@ -732,7 +1019,7 @@ class ScrollViewController: UIViewController, UIPickerViewDelegate, UIPickerView
     // ローカル通知
     func setNotification(data: Data) {
         let content = UNMutableNotificationContent()
-        content.title = "廃液開始"
+        content.title = "排液開始"
         content.body = PStopText
         content.sound = UNNotificationSound.default()
         

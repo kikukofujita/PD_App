@@ -47,6 +47,8 @@ class Data: Object {
     
     dynamic var stockPlace = ""       //　在庫場所
     
+    dynamic var firebaseKey = ""      // Firebaseのリレーションキー
+    
     
     // id = プライマリーキー
     override static func primaryKey() -> String? {
